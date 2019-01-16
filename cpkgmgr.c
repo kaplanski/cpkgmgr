@@ -25,13 +25,13 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
  int instlldfd = -1, cfgfd_creat = -1;
 
  if(access(pkgdir, F_OK) == -1)
-  {mkdir(pkgdir, S_IRWXU | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+  {mkdir(pkgdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
    printf("Initial pkgfldr created!\n");}
  if(access(indir, F_OK) == -1)
-  {mkdir(indir, S_IRWXU | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+  {mkdir(indir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
    printf("Initial infldr created!\n");}
  if(access(archdir, F_OK) == -1)
-  {mkdir(archdir, S_IRWXU | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+  {mkdir(archdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
    printf("Initial ARCHfldr created!\n");}
  if((access(instlld, F_OK) == -1) && (sup_arch == 1))
   {
