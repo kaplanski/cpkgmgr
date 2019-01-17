@@ -30,10 +30,12 @@ extern void read_db(char fname[512], int display_all, int search, char searchval
 
  if (indexfd != -1)
   {
+   /*
    if ((display_all == 1) || (search == 1))
     {
      printf("Name - Version:\n");
     }
+   */
    while ((read(indexfd, buffer, 1)) != 0)
     {
      if ((strncmp(buffer, "\n", 1)) != 0)

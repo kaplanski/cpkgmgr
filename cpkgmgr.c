@@ -287,11 +287,17 @@ int main(int argc, char *argv[]){
 
    /* display all available packages */
    else if ((strcmp(argv[1], "-da")) == 0)
-    {}
+    {
+     printf("Available Packages:\n");
+     read_db(indexfile, 1, 0, NULL);
+    }
 
    /* display all installed packages */
    else if ((strcmp(argv[1], "-di")) == 0)
-    {}
+    {
+     printf("Installed Packages:\n");
+     read_db(instlld, 1, 0, NULL);
+    }
 
    /* install a new package */
    else if ((strcmp(argv[1], "-i")) == 0)
@@ -307,7 +313,10 @@ int main(int argc, char *argv[]){
      if (argc < 3)
       {printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);}
      else
-      {read_db(indexfile, 0, 1, argv[2]);}
+      {
+       printf("Search Result:\n");
+       read_db(indexfile, 0, 1, argv[2]);
+      }
     }
 
    /* update the package index */
