@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "mod_dbinterpret.h"
 #define PKGDIR "/cpkgmgr"
 #define INDIR "/bin"
 #define ARCHDIR "/ARCH"
@@ -21,7 +22,8 @@
 
 /* initial creation of various folders and the instlld file */
 void first_run(char pkgdir[512], char indir[512], char archdir[512], \
-               char arch[16], char instlld[512], char cfgfile[512], int sup_arch){
+               char arch[16], char instlld[512], char cfgfile[512], \
+               int sup_arch, char indexf[512]){
  int instlldfd = -1, cfgfd_creat = -1;
 
  if(access(pkgdir, F_OK) == -1)
@@ -157,7 +159,8 @@ int main(int argc, char *argv[]){
  int i = 0, j = 0, sup_arch = 0, cfgfd = -1, arch_set = 0, repo_set = 0;
  char pkgfldr[512] = "", infldr[512] = "", archfldr[512] = "", \
       instlld[512] = "", arch[16] = "python2", repo[1024] = REPO, \
-      cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512];
+      cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
+      indexfile[512] = "";
  const char *home = getenv("HOME");
  const char *archlst[4];
  archlst[0] = "python2";
@@ -246,11 +249,17 @@ int main(int argc, char *argv[]){
  strcat(instlld, arch);
  strcat(instlld, ".db");
 
+ strcpy(indexfile, pkgfldr);
+ strcat(indexfile, "/index_");
+ strcat(indexfile, arch);
+ strcat(indexfile, ".db");
+
  /* most important thing first: the info */
  info();
 
  /* create initial folders/files */
- first_run(pkgfldr, infldr, archfldr, arch, instlld, cfgfile, sup_arch);
+ first_run(pkgfldr, infldr, archfldr, arch, instlld, \
+           cfgfile, sup_arch, indexfile);
 
  if (argc == 1)
   {
@@ -294,7 +303,12 @@ int main(int argc, char *argv[]){
 
    /* search for a package */
    else if ((strcmp(argv[1], "-s")) == 0)
-    {}
+    {
+     if (argc < 3)
+      {printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);}
+     else
+      {read_db(indexfile, 0, 1, argv[2]);}
+    }
 
    /* update the package index */
    else if ((strcmp(argv[1], "-u")) == 0)
