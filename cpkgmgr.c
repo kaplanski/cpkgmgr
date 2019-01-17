@@ -202,9 +202,12 @@ int main(int argc, char *argv[]){
          #ifdef DEBUG
          printf("cfgtmp: %s\n", cfgtmp);
          #endif
-         if ((strstr(cfgtmp, "#")) != NULL)
-          {}
-         else if (((strstr(cfgtmp, "repo=")) != NULL) && (repo_set == 0))
+         if ((strncmp(cfgtmp, "#", 1)) == 0)
+          {
+           /* do nothing */
+           sleep(0);
+          }
+         else if (((strncmp(cfgtmp, "repo=", 5)) == 0) && (repo_set == 0))
           {
            strcpy(repo, cfgtmp+5);
            repo_set = 1;
@@ -212,7 +215,7 @@ int main(int argc, char *argv[]){
            printf("repo set!\n");
            #endif
           }
-         else if (((strstr(cfgtmp, "arch=")) != NULL) && (arch_set == 0))
+         else if (((strncmp(cfgtmp, "arch=", 5)) == 0) && (arch_set == 0))
           {
            strcpy(arch, cfgtmp+5);
            arch_set = 1;
