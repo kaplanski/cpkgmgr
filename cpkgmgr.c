@@ -18,7 +18,6 @@
 #define REPO "https://gitup.uni-potsdam.de/kaplanski/pkgmgr/raw/master/repo"
 
 /* #define DEBUG */
-/* #define PY2DBG */
 
 /* initial creation of various folders and the instlld file */
 void first_run(char pkgdir[512], char indir[512], char archdir[512], \
@@ -167,10 +166,6 @@ int main(int argc, char *argv[]){
  archlst[1] = "python3";
  archlst[2] = "i386";
  archlst[3] = "amd64";
-
- #ifdef PY2DBG
- strcpy(arch, "python2");
- #endif
 
  /* pfad var init */
  strcpy(pkgfldr, home);
