@@ -102,27 +102,12 @@ void run_app(char indir[512], char app[]){
 /* clean the ARCH folder */
 void clean(char archdir[512]){
 
- char tmp[512];
+ char syscall[1024];
  printf("Cleaning ARCH folder... ");
-
- DIR *d;
- struct dirent *dir;
- d = opendir(archdir);
- if (d)
-  {
-   while ((dir = readdir(d)) != NULL)
-    {
-     if ((strcmp(dir->d_name, ".")) != 0 && ((strcmp(dir->d_name, "..")) != 0))
-      {
-       strcpy(tmp, archdir);
-       strcat(tmp, "/");
-       strcat(tmp, dir->d_name);
-       remove(tmp);
-      }
-    }
-   closedir(d);
-  }
-
+ strcpy(syscall, "rm -rf ");
+ strcat(syscall, archdir);
+ strcat(syscall, "/*"); /**/
+ system(syscall);
  printf("[Done]\n");
 
 }
