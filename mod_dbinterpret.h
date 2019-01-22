@@ -1,4 +1,4 @@
-extern void prep_workln(char workln[512], char (*pkgid)[32], \
+void prep_workln(char workln[512], char (*pkgid)[32], \
                  char (*pkgname)[256], char (*pkgver)[32]){
 
  /* Var Init */
@@ -19,9 +19,9 @@ extern void prep_workln(char workln[512], char (*pkgid)[32], \
   }
 }
 
-extern void read_db(char fname[512], int display_all, int search, char searchval[256]){
+extern int read_db(char fname[512], int display_all, int search, char searchval[256]){
  /* Var Init */
- int indexfd = -1, i = 0, fline_len = 0;
+ int indexfd = -1, i = 0, fline_len = 0, scount = 0;
  char buffer[32], line[512], fline[512], workln[512];
  char pkgid[32] = "", pkgname[256] = "", pkgver[32] = "";
 
@@ -71,15 +71,23 @@ extern void read_db(char fname[512], int display_all, int search, char searchval
          /* split by : */
          prep_workln(workln, &pkgid, &pkgname, &pkgver);
 
+         /* printout the whole list */
          if ((display_all == 1) && (search == 0))
-          {
-           printf("%s - %s\n", pkgname, pkgver);
-          }
+          {printf("%s - %s\n", pkgname, pkgver);}
+
+         /* search + printout */
          else if ((search == 1) && (display_all == 0))
           {
            if ((strcasestr(pkgname, searchval)) != NULL)
             {printf("%s - %s\n", pkgname, pkgver);}
           }
+
+         /* same as above, just that it does not output. used in -i */
+         else if ((search == 1) && (display_all == 1))
+           {
+            if ((strstr(pkgname, searchval)) != NULL)
+             {scount++;}
+           }
         }
 
        /* reset counter */
@@ -90,4 +98,4 @@ extern void read_db(char fname[512], int display_all, int search, char searchval
    close(indexfd);
   }
 
-}
+return scount;}

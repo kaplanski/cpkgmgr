@@ -6,12 +6,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "mod_dbinterpret.h"
+#include "mod_installer.h"
 #define PKGDIR "/cpkgmgr"
 #define INDIR "/bin"
 #define ARCHDIR "/ARCH"
@@ -281,7 +281,25 @@ int main(int argc, char *argv[]){
 
    /* install a new package */
    else if ((strcmp(argv[1], "-i")) == 0)
-    {}
+    {
+     if (argc < 3)
+      {
+       printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
+       exit(222);
+      }
+     else
+     if (read_db(indexfile, 1, 1, argv[2]) == 1)
+      {
+       printf("Downloading %s...\n", argv[2]);
+       //install("testbinary_v0.1", pkgfldr, infldr, app);
+      }
+     else
+      {
+       printf("%s was not found on the index...\n" \
+              "Similar sounding packages:\n", argv[2]);
+       read_db(indexfile, 0, 1, argv[2]);
+      }
+    }
 
    /* remove a package */
    else if ((strcmp(argv[1], "-r")) == 0)
@@ -291,7 +309,10 @@ int main(int argc, char *argv[]){
    else if ((strcmp(argv[1], "-s")) == 0)
     {
      if (argc < 3)
-      {printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);}
+      {
+       printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
+       exit(222);
+      }
      else
       {
        printf("Search Result:\n");
@@ -313,7 +334,10 @@ int main(int argc, char *argv[]){
      if (argc > 2)
       {run_app(infldr, argv[2]);}
      else
-      {printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);}
+      {
+       printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
+       exit(222);
+      }
     }
    else
     {printf("Unknown option!\n");}
