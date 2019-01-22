@@ -22,9 +22,10 @@
 /* initial creation of various folders and the instlld file */
 void first_run(char pkgdir[512], char indir[512], char archdir[512], \
                char arch[16], char instlld[512], char cfgfile[512], \
-               int sup_arch, char indexf[512]){
+               int sup_arch, char indexf[512], char repo[1024]){
  int instlldfd = -1, cfgfd_creat = -1;
 
+ /* create folders + installed db */
  if(access(pkgdir, F_OK) == -1)
   {mkdir(pkgdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
    printf("Initial pkgfldr created!\n");}
@@ -47,7 +48,8 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
     {printf("Failed to create installed_%s.db\n", arch);}
   }
 
-if((access(cfgfile, F_OK) == -1))
+ /* create config file */
+ if((access(cfgfile, F_OK) == -1))
   {
    cfgfd_creat = open(cfgfile, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
    if (cfgfd_creat != -1)
@@ -64,27 +66,10 @@ if((access(cfgfile, F_OK) == -1))
    else
     {printf("Failed to create pkgmgr.cfg\n");}
   }
-}
 
-void download(char repo[1024], char arch[16], char dwfile[512], char saveas[512]){
-
- char syscall[4096] = "";
-
- strcpy(syscall, "wget -q -t 1 ");
- strcat(syscall, repo);
- strcat(syscall, "/");
- strcat(syscall, arch);
- strcat(syscall, "/");
- strcat(syscall, dwfile);
- if (saveas != NULL)
-  {
-   strcat(syscall, " -O ");
-   strcat(syscall, saveas);
-  }
- //#ifdef DEBUG
- printf("syscall (download) = %s\n", syscall);
- //#endif
- system(syscall);
+ /* download Package index */
+ if((access(indexf, F_OK) == -1))
+  {download(repo, arch, "index.db", indexf);}
 }
 
 /* execute an installed app */
@@ -165,7 +150,7 @@ int main(int argc, char *argv[]){
  char pkgfldr[512] = "", infldr[512] = "", archfldr[512] = "", \
       instlld[512] = "", arch[16] = "python2", repo[1024] = REPO, \
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
-      indexfile[512] = "", intmp[256] = "", intmp2[256] = "";
+      indexfile[512] = "", intmp[256] = "", intmp2[256] = "", syscall[1024];
  const char *home = getenv("HOME");
  const char *archlst[4];
  archlst[0] = "python2";
@@ -260,7 +245,7 @@ int main(int argc, char *argv[]){
 
  /* create initial folders/files */
  first_run(pkgfldr, infldr, archfldr, arch, instlld, \
-           cfgfile, sup_arch, indexfile);
+           cfgfile, sup_arch, indexfile, repo);
 
  if (argc == 1)
   {
@@ -308,8 +293,7 @@ int main(int argc, char *argv[]){
        printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
        exit(222);
       }
-     else
-     if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
+     else if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
       {
        if(access(intmp, F_OK) != -1)
         {printf("Using cached package...\n");}
@@ -333,7 +317,37 @@ int main(int argc, char *argv[]){
 
    /* remove a package */
    else if ((strcmp(argv[1], "-r")) == 0)
-    {}
+    {
+
+
+
+     if (argc < 3)
+      {
+       printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
+       exit(222);
+      }
+     else if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
+      {
+       chdir(infldr);
+       strcpy(syscall, "rm -rf ");
+       strcat(syscall, infldr);
+       strcat(syscall, "/");
+       strcat(syscall, argv[2]);
+       printf("syscall = %s\n", syscall);
+       //system(syscall);
+      }
+     else
+      {
+       printf("%s was not found on the index...\n" \
+              "Similar sounding packages:\n", argv[2]);
+       read_db(indexfile, 0, 1, argv[2], NULL);
+      }
+
+
+
+
+
+    }
 
    /* search for a package */
    else if ((strcmp(argv[1], "-s")) == 0)
