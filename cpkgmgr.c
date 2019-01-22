@@ -66,6 +66,27 @@ if((access(cfgfile, F_OK) == -1))
   }
 }
 
+void download(char repo[1024], char arch[16], char dwfile[512], char saveas[512]){
+
+ char syscall[4096] = "";
+
+ strcpy(syscall, "wget -q -t 1 ");
+ strcat(syscall, repo);
+ strcat(syscall, "/");
+ strcat(syscall, arch);
+ strcat(syscall, "/");
+ strcat(syscall, dwfile);
+ if (saveas != NULL)
+  {
+   strcat(syscall, " -O ");
+   strcat(syscall, saveas);
+  }
+ #ifdef DEBUG
+ printf("syscall (download) = %s\n", syscall);
+ #endif
+ system(syscall);
+}
+
 /* execute an installed app */
 void run_app(char indir[512], char app[]){
  int i = 0, app_present = 0;
@@ -322,7 +343,10 @@ int main(int argc, char *argv[]){
 
    /* update the package index */
    else if ((strcmp(argv[1], "-u")) == 0)
-    {}
+    {
+     //chdir(pkgfldr);
+     download(repo, arch, "index.db", indexfile);
+    }
 
    /* reinstall a (currently installed) package */
    else if ((strcmp(argv[1], "-ri")) == 0)
