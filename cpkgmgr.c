@@ -81,9 +81,9 @@ void download(char repo[1024], char arch[16], char dwfile[512], char saveas[512]
    strcat(syscall, " -O ");
    strcat(syscall, saveas);
   }
- #ifdef DEBUG
+ //#ifdef DEBUG
  printf("syscall (download) = %s\n", syscall);
- #endif
+ //#endif
  system(syscall);
 }
 
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]){
  char pkgfldr[512] = "", infldr[512] = "", archfldr[512] = "", \
       instlld[512] = "", arch[16] = "python2", repo[1024] = REPO, \
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
-      indexfile[512] = "";
+      indexfile[512] = "", intmp[256] = "", intmp2[256] = "";
  const char *home = getenv("HOME");
  const char *archlst[4];
  archlst[0] = "python2";
@@ -290,14 +290,14 @@ int main(int argc, char *argv[]){
    else if ((strcmp(argv[1], "-da")) == 0)
     {
      printf("Available Packages:\n");
-     read_db(indexfile, 1, 0, NULL);
+     read_db(indexfile, 1, 0, NULL, NULL);
     }
 
    /* display all installed packages */
    else if ((strcmp(argv[1], "-di")) == 0)
     {
      printf("Installed Packages:\n");
-     read_db(instlld, 1, 0, NULL);
+     read_db(instlld, 1, 0, NULL, NULL);
     }
 
    /* install a new package */
@@ -309,16 +309,25 @@ int main(int argc, char *argv[]){
        exit(222);
       }
      else
-     if (read_db(indexfile, 1, 1, argv[2]) == 1)
+     if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
       {
-       printf("Downloading %s...\n", argv[2]);
-       //install("testbinary_v0.1", pkgfldr, infldr, app);
+       if(access(intmp, F_OK) != -1)
+        {printf("Using cached package...\n");}
+       else
+        {
+         printf("Downloading %s...\n", argv[2]);
+         chdir(archfldr);
+         download(repo, arch, intmp, NULL);
+        }
+       strncpy(intmp2, intmp, strlen(intmp)-4);
+       intmp2[strlen(intmp)-3] = '\0';
+       install(intmp2, pkgfldr, infldr, argv[2]);
       }
      else
       {
        printf("%s was not found on the index...\n" \
               "Similar sounding packages:\n", argv[2]);
-       read_db(indexfile, 0, 1, argv[2]);
+       read_db(indexfile, 0, 1, argv[2], NULL);
       }
     }
 
@@ -337,14 +346,13 @@ int main(int argc, char *argv[]){
      else
       {
        printf("Search Result:\n");
-       read_db(indexfile, 0, 1, argv[2]);
+       read_db(indexfile, 0, 1, argv[2], NULL);
       }
     }
 
    /* update the package index */
    else if ((strcmp(argv[1], "-u")) == 0)
     {
-     //chdir(pkgfldr);
      download(repo, arch, "index.db", indexfile);
     }
 

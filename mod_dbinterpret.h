@@ -19,7 +19,7 @@ void prep_workln(char workln[512], char (*pkgid)[32], \
   }
 }
 
-extern int read_db(char fname[512], int display_all, int search, char searchval[256]){
+extern int read_db(char fname[512], int display_all, int search, char searchval[256], char (*rval)[256]){
  /* Var Init */
  int indexfd = -1, i = 0, fline_len = 0, scount = 0;
  char buffer[32], line[512], fline[512], workln[512];
@@ -82,11 +82,17 @@ extern int read_db(char fname[512], int display_all, int search, char searchval[
             {printf("%s - %s\n", pkgname, pkgver);}
           }
 
-         /* same as above, just that it does not output. used in -i */
+         /* same as above, does not output, case sensitive, used in -i */
          else if ((search == 1) && (display_all == 1))
            {
             if ((strstr(pkgname, searchval)) != NULL)
-             {scount++;}
+             {
+              strcpy(*rval, pkgname);
+              strcat(*rval, "_v");
+              strcat(*rval, pkgver);
+              strcat(*rval, ".tgz");
+              scount++;
+             }
            }
         }
 
