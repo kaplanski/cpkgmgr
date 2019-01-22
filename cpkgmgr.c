@@ -150,7 +150,8 @@ int main(int argc, char *argv[]){
  char pkgfldr[512] = "", infldr[512] = "", archfldr[512] = "", \
       instlld[512] = "", arch[16] = "python2", repo[1024] = REPO, \
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
-      indexfile[512] = "", intmp[256] = "", intmp2[256] = "", syscall[1024];
+      indexfile[512] = "", intmp[256] = "", intmp2[256] = "", syscall[1024], \
+      lctmp[12] = "", lctmp2[256] = "";
  const char *home = getenv("HOME");
  const char *archlst[4];
  archlst[0] = "python2";
@@ -318,9 +319,6 @@ int main(int argc, char *argv[]){
    /* remove a package */
    else if ((strcmp(argv[1], "-r")) == 0)
     {
-
-
-
      if (argc < 3)
       {
        printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
@@ -329,24 +327,29 @@ int main(int argc, char *argv[]){
      else if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
       {
        chdir(infldr);
-       strcpy(syscall, "rm -rf ");
-       strcat(syscall, infldr);
-       strcat(syscall, "/");
-       strcat(syscall, argv[2]);
-       printf("syscall = %s\n", syscall);
-       //system(syscall);
+       if(access(argv[2], F_OK) != -1)
+        {
+         strcpy(syscall, "rm -rf ");
+         strcat(syscall, infldr);
+         strcat(syscall, "/");
+         strcat(syscall, argv[2]);
+         system(syscall);
+         /* todo: remove from instlld */
+         printf("Done!\n");
+        }
+       else
+        {
+         printf("%s was not found in %s!\n" \
+                "Similar sounding packages:\n", argv[2], infldr);
+         read_db(instlld, 0, 1, argv[2], NULL);
+        }
       }
      else
       {
        printf("%s was not found on the index...\n" \
               "Similar sounding packages:\n", argv[2]);
-       read_db(indexfile, 0, 1, argv[2], NULL);
+       read_db(instlld, 0, 1, argv[2], NULL);
       }
-
-
-
-
-
     }
 
    /* search for a package */
@@ -372,7 +375,23 @@ int main(int argc, char *argv[]){
 
    /* reinstall a (currently installed) package */
    else if ((strcmp(argv[1], "-ri")) == 0)
-    {}
+    {
+
+     sprintf(lctmp, "%d", read_db(instlld, 0, 0, NULL, NULL));
+     if (strlen(lctmp) > 1)
+      {strcpy(lctmp2, "{0");}
+     else
+      {strcpy(lctmp2, "{00");}
+     strcat(lctmp2, lctmp);
+     strcat(lctmp2, ":");
+     strcat(lctmp2, argv[2]);
+     strcat(lctmp2, ":");
+     strcat(lctmp2, "DUMMYVER-1");
+     strcat(lctmp2, "}\n");
+
+    printf("lctmp2 = %s", lctmp2);
+
+    }
 
    /* execute an installed package */
    else if ((strcmp(argv[1], "run")) == 0)
