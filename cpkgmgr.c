@@ -17,7 +17,11 @@
 #define ARCHDIR "/ARCH"
 #define REPO "https://gitup.uni-potsdam.de/kaplanski/pkgmgr/raw/master/repo"
 
-/* #define DEBUG */
+/* Turn on debug/verbose output */
+// #define DEBUG
+
+/* Revert back from installed.db to old installed_$arch.db */
+//#define OLD
 
 /* initial creation of various folders and the instlld file */
 void first_run(char pkgdir[512], char indir[512], char archdir[512], \
@@ -35,17 +39,34 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
  if(access(archdir, F_OK) == -1)
   {mkdir(archdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
    printf("Initial ARCHfldr created!\n");}
+ #ifdef OLD
  if((access(instlld, F_OK) == -1) && (sup_arch == 1))
+ #endif
+ #ifndef OLD
+ if (access(instlld, F_OK) == -1)
+ #endif
   {
    instlldfd = open(instlld, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
    if (instlldfd != -1)
     {
      write(instlldfd,"[PKGID:Name:Version]\n", strlen("[PKGID:Name:Version]\n"));
      close(instlldfd);
+     #ifdef OLD
      printf("Initial installed_%s.db created!\n", arch);
+     #endif
+     #ifndef OLD
+     printf("Initial installed.db created!\n");
+     #endif
     }
    else
-    {printf("Failed to create installed_%s.db\n", arch);}
+    {
+     #ifdef OLD
+     printf("Failed to create installed_%s.db\n", arch);
+     #endif
+     #ifndef OLD
+     printf("Failed to create installed.db\n");
+     #endif
+    }
   }
 
  /* create config file */
@@ -146,12 +167,13 @@ void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
 
 int main(int argc, char *argv[]){
  /* Var Init */
- int i = 0, j = 0, sup_arch = 0, cfgfd = -1, arch_set = 0, repo_set = 0;
+ int i = 0, j = 0, sup_arch = 0, cfgfd = -1, arch_set = 0, \
+     repo_set = 0, pkgverlen = 0, instlldfd = -1;
  char pkgfldr[512] = "", infldr[512] = "", archfldr[512] = "", \
       instlld[512] = "", arch[16] = "python2", repo[1024] = REPO, \
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
       indexfile[512] = "", intmp[256] = "", intmp2[256] = "", syscall[1024], \
-      lctmp[12] = "", lctmp2[256] = "";
+      lctmp[12] = "", lctmp2[256] = "", pkgver[32] = "";
  const char *home = getenv("HOME");
  const char *archlst[4];
  archlst[0] = "python2";
@@ -232,9 +254,14 @@ int main(int argc, char *argv[]){
 
  /* finally we can use arch in our vars */
  strcpy(instlld, pkgfldr);
+ #ifdef OLD
  strcat(instlld, "/installed_");
  strcat(instlld, arch);
  strcat(instlld, ".db");
+ #endif
+ #ifndef OLD
+ strcat(instlld, "/installed.db");
+ #endif
 
  strcpy(indexfile, pkgfldr);
  strcat(indexfile, "/index_");
@@ -294,28 +321,72 @@ int main(int argc, char *argv[]){
        printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
        exit(222);
       }
-     else if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
-      {
-       if(access(intmp, F_OK) != -1)
-        {printf("Using cached package...\n");}
-       else
-        {
-         printf("Downloading %s...\n", argv[2]);
-         chdir(archfldr);
-         download(repo, arch, intmp, NULL);
-        }
-       strncpy(intmp2, intmp, strlen(intmp)-4);
-       intmp2[strlen(intmp)-3] = '\0';
-       install(intmp2, pkgfldr, infldr, argv[2]);
-      }
      else
       {
-       printf("%s was not found on the index...\n" \
-              "Similar sounding packages:\n", argv[2]);
-       read_db(indexfile, 0, 1, argv[2], NULL);
+       if (read_db(instlld, 1, 1, argv[2], &intmp) > 0)
+        {
+         printf("%s is already installed! (Did you mean: -ri)\n", argv[2]);
+         exit(201);
+        }
+       else
+        {
+         if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
+          {
+           if(access(intmp, F_OK) != -1)
+            {printf("Using cached package...\n");}
+           else
+            {
+             printf("Downloading %s...\n", argv[2]);
+             chdir(archfldr);
+             download(repo, arch, intmp, NULL);
+            }
+
+           strncpy(intmp2, intmp, strlen(intmp)-4);
+           intmp2[strlen(intmp)-3] = '\0';
+           install(intmp2, pkgfldr, infldr, argv[2]);
+
+           /* add to instlld */
+           /* -6 = _v + .tgz */
+           pkgverlen = (strlen(intmp) - strlen(argv[2]) - 6);
+           strncpy(pkgver, intmp+strlen(argv[2])+2, pkgverlen);
+           pkgver[pkgverlen+1] = '\0';
+
+           /* generate the entry */
+           /* get new ID via line count */
+           sprintf(lctmp, "%d", read_db(instlld, 0, 0, NULL, NULL));
+           if (strlen(lctmp) > 1)
+            {strcpy(lctmp2, "{0");}
+           else
+            {strcpy(lctmp2, "{00");}
+           strcat(lctmp2, lctmp);
+           strcat(lctmp2, ":");
+           strcat(lctmp2, argv[2]);
+           strcat(lctmp2, ":");
+           strcat(lctmp2, pkgver);
+           strcat(lctmp2, "}\n");
+
+           #ifdef DEBUG
+           printf("lctmp2 = %s", lctmp2);
+           #endif
+
+           instlldfd = open(instlld, O_WRONLY | O_APPEND);
+           if (instlldfd != -1)
+            {
+             write(instlldfd, lctmp2, strlen(lctmp2));
+             close(instlldfd);
+            }
+           else
+            {printf("Could not open %s!\n", instlld);}
+          }
+         else
+          {
+           printf("%s was not found on the index...\n" \
+                  "Similar sounding packages:\n", argv[2]);
+           read_db(indexfile, 0, 1, argv[2], NULL);
+          }
+        }
       }
     }
-
    /* remove a package */
    else if ((strcmp(argv[1], "-r")) == 0)
     {
@@ -376,32 +447,23 @@ int main(int argc, char *argv[]){
    /* reinstall a (currently installed) package */
    else if ((strcmp(argv[1], "-ri")) == 0)
     {
-
-     sprintf(lctmp, "%d", read_db(instlld, 0, 0, NULL, NULL));
-     if (strlen(lctmp) > 1)
-      {strcpy(lctmp2, "{0");}
-     else
-      {strcpy(lctmp2, "{00");}
-     strcat(lctmp2, lctmp);
-     strcat(lctmp2, ":");
-     strcat(lctmp2, argv[2]);
-     strcat(lctmp2, ":");
-     strcat(lctmp2, "DUMMYVER-1");
-     strcat(lctmp2, "}\n");
-
-    printf("lctmp2 = %s", lctmp2);
-
+     /* CODE */
     }
 
    /* execute an installed package */
    else if ((strcmp(argv[1], "run")) == 0)
     {
-     if (argc > 2)
-      {run_app(infldr, argv[2]);}
-     else
+     if (argc < 2)
       {
        printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
        exit(222);
+      }
+     else
+      {
+       if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
+        {run_app(infldr, argv[2]);}
+       else
+        {printf("%s was not found in %s!\n", argv[2], instlld);}
       }
     }
    else
