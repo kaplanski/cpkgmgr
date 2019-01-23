@@ -1,9 +1,5 @@
-CC=gcc
-CFLAGS=-std=gnu99 -Wall -Wextra -pedantic
-all: cpkgmgr
-
-cpkgmgr: cpkgmgr.c
-	 $(CC) $(CFLAGS) -o $@ $^
+all:
+	./build.sh
 
 clean:
 	rm -f *.o
