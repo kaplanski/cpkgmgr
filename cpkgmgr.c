@@ -1,6 +1,7 @@
 /*
  cpkgmgr - a port of pkgmgr to c
- Copyright (c) 2019 Kaplanski
+ Copyright (c) 2019 Jan-Daniel Kaplanski
+ MIT/X11 LICENSE
 */
 
 #include <stdio.h>
