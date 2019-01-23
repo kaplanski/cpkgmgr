@@ -1,3 +1,14 @@
+#ifndef _MOD_DBINTERPRET_H
+#define _MOD_DBINTERPRET_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 void prep_workln(char workln[512], char (*pkgid)[32], \
                  char (*pkgname)[256], char (*pkgver)[32]){
 
@@ -110,3 +121,5 @@ if ((search == 0) && (display_all == 0))
  else
   {return scount;}
 }
+
+#endif

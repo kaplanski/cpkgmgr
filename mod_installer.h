@@ -1,3 +1,6 @@
+#ifndef _MOD_INSTALLER_H
+#define _MOD_INSTALLER_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -188,3 +191,4 @@ void download(char repo[1024], char arch[16], char dwfile[512], char saveas[512]
  system(syscall);
 }
 
+#endif
