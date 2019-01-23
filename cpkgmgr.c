@@ -130,7 +130,7 @@ void run_app(char indir[512], char app[]){
 void clean(char archdir[512]){
 
  char syscall[1024];
- printf("Cleaning ARCH folder... ");
+ printf("Cleaning %s... ", archdir);
  strcpy(syscall, "rm -rf ");
  strcat(syscall, archdir);
  strcat(syscall, "/*"); /**/
