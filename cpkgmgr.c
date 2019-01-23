@@ -270,7 +270,10 @@ int main(int argc, char *argv[]){
  strcat(indexfile, ".db");
 
  /* most important thing first: the info */
- info();
+ if ((argc > 1) && (strcmp(argv[1], "run")) == 0)
+  {sleep(0);}
+ else
+  {info();}
 
  /* create initial folders/files */
  first_run(pkgfldr, infldr, archfldr, arch, instlld, \
