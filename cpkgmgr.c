@@ -26,7 +26,7 @@
 /* initial creation of various folders and the instlld file */
 void first_run(char pkgdir[512], char indir[512], char archdir[512], \
                char arch[16], char instlld[512], char cfgfile[512], \
-               int sup_arch, char indexf[512], char repo[1024]){
+               int sup_arch __attribute__((__unused__)), char indexf[512], char repo[1024]){
  int instlldfd = -1, cfgfd_creat = -1;
 
  /* create folders + installed db */
@@ -111,7 +111,7 @@ void run_app(char indir[512], char app[]){
   {printf("App %s is not installed!\n", app);}
  else
   {
-   for (i = 0; i < (sizeof(end)/sizeof(*end)); i++)
+   for (i = 0; i < (int)(sizeof(end)/sizeof(*end)); i++)
     {
      strcpy(tmp, app_path);
      strcat(tmp, app);
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]){
     }
   }
 
- for (i = 0; i < (sizeof(archlst)/sizeof(*archlst)); i++)
+ for (i = 0; i < (int)(sizeof(archlst)/sizeof(*archlst)); i++)
   {
    if ((strcmp(archlst[i], arch)) == 0)
     {sup_arch = 1; break;}

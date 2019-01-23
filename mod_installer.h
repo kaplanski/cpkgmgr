@@ -11,7 +11,7 @@
 
 void read_display(char archdir[512], char pkg[256], char app[64]){
 
- int displayfd = -1, installfd = -1, i = 0;
+ int displayfd = -1, i = 0;
  char fname[512], buffer[32], line[512], fline[512];
 
  /* set file path */
