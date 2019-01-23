@@ -19,7 +19,7 @@
 #define REPO "https://gitup.uni-potsdam.de/kaplanski/pkgmgr/raw/master/repo"
 
 /* Turn on debug/verbose output */
-// #define DEBUG
+//#define DEBUG
 
 /* Revert back from installed.db to old installed_$arch.db */
 //#define OLD
@@ -442,7 +442,9 @@ int main(int argc, char *argv[]){
    /* update the package index */
    else if ((strcmp(argv[1], "-u")) == 0)
     {
+     printf("Updating index for %s... ", arch);
      download(repo, arch, "index.db", indexfile);
+     printf("[Done]\n");
     }
 
    /* reinstall a (currently installed) package */
