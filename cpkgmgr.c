@@ -275,7 +275,7 @@ int main(int argc, char *argv[]){
  strcat(indexfile, ".db");
 
  /* most important thing first: the info */
- if (((argc > 1) && ((strcmp(argv[1], "run")) == 0)) || ((argc > 1) && ((strcmp(argv[1], "-ri")) == 0)))
+ if (((argc > 1) && ((strcmp(argv[1], "run")) == 0)) || ((argc > 3) && ((strcmp(argv[3], "-ri")) == 0)))
   {sleep(0);}
  else
   {info();}
@@ -332,11 +332,13 @@ int main(int argc, char *argv[]){
       }
      else
       {
-       if ((argc < 4) && (read_db(instlld, 1, 1, argv[2], &intmp) > 0))
+       if ((argc != 4) && (read_db(instlld, 1, 1, argv[2], &intmp) > 0))
         {
          printf("%s is already installed! (Did you mean: -ri)\n", argv[2]);
          exit(201);
         }
+       else if ((argc == 4) && (strcmp("-ri", argv[3]) != 0))
+        {execlp(argv[0], argv[0], "-i", argv[2], "-ri", NULL);}
        else if ((argc == 3) || (strcmp("-ri", argv[3]) == 0))
         {
          if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
