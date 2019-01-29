@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include "mod_dbinterpret.h"
 #include "mod_installer.h"
+#include "mod_setup.h"
 #define PKGDIR "/cpkgmgr"
 #define INDIR "/bin"
 #define ARCHDIR "/ARCH"
@@ -163,7 +164,8 @@ void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
         "   -s [pkg]: searches for a package in the package index\n" \
         "  -da: list all available packages for %s\n" \
         "  -di: list all installed packages for %s\n" \
-        "  -ca [arch]: change your architecture\n" \
+        "setup: change your architecture or repo\n" \
+        "  run: execute an installed app\n" \
         "Current binary folder: %s\n" \
         "Current pkgmgr folder: %s\n" \
         "Current architecture: %s\n", prg, arch, arch, indir, pkgdir, arch);
@@ -458,6 +460,10 @@ int main(int argc, char *argv[]){
     {
      /* CODE */
     }
+
+   /* set arch or repo */
+   else if ((strcmp(argv[1], "setup")) == 0)
+    {editcfg(cfgfile);}
 
    /* execute an installed package */
    else if ((strcmp(argv[1], "run")) == 0)

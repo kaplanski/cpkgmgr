@@ -8,7 +8,6 @@ At that point in time cpkgmgr will be renamed to pkgmgr
 - wget (package download)  
 
 *WIP Content:*  
-- -ca (changing arch)  
 - -ri (reinstall of installed packages)  
 - -r (needs to remove entry from installed.db)  
 
