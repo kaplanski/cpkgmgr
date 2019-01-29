@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 CC=
-PROG="cpkgmgr"
+PROG="pkgmgr"
 PROGPATH="$HOME/$PROG"
 FLAGS="-std=gnu99 -Wall -Wextra -pedantic"
 

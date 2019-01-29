@@ -1,5 +1,5 @@
 /*
- cpkgmgr - a port of pkgmgr to c
+ pkgmgr - a port of pkgmgr to c
  Copyright (c) 2019 Jan-Daniel Kaplanski
  MIT/X11 LICENSE
 */
@@ -17,7 +17,7 @@
 #include "mod_dbinterpret.h"
 #include "mod_installer.h"
 #include "mod_setup.h"
-#define PKGDIR "/cpkgmgr"
+#define PKGDIR "/pkgmgr"
 #define INDIR "/bin"
 #define ARCHDIR "/ARCH"
 #define REPO "https://gitup.uni-potsdam.de/kaplanski/pkgmgr/raw/master/repo"
@@ -147,7 +147,7 @@ void clean(char archdir[512]){
 /* just an info display */
 void info(void){
  printf("+-----------------------------------------------+\n" \
-        "|             cpkgmgr - pkgmgr in c             |\n" \
+        "|             pkgmgr - pkgmgr in c              |\n" \
         "|    Copyright (c) 2019 Jan-Daniel Kaplanski    |\n" \
         "+-----------------------------------------------+\n\n");
 }
