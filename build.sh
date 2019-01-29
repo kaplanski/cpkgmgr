@@ -14,6 +14,7 @@ if [ "$PWD" == "$PROGPATH" -o "$PWD" == "/usr$PROGPATH" ]; then
    exec ./build.sh
 fi
 
+#building procedure
 if [ "$1" == "" -o "$1" == "all" ]; then
    #set compiler
    echo "Setting compiler..."
@@ -44,6 +45,7 @@ if [ "$1" == "" -o "$1" == "all" ]; then
    $CC $FLAGS $PROG.c -o $PROG
    echo
 
+#install/copy to the program folder at $PROGPATH
 elif [ "$1" == "install" -a -f $PROG ]; then
    if [ ! -f $PROGPATH/$PROG ];then
       #initial execution (creates folders and such)
@@ -55,7 +57,13 @@ elif [ "$1" == "install" -a -f $PROG ]; then
    echo "$PROG is copied to $PROGPATH"
    cp $PROG $PROGPATH
 
+#or build first if it wasn't build
+elif [ "$1" == "install" -a ! -f $PROG ]; then
+   $0 && $0 install
+
+#clean the build dir of binaries
 elif [ "$1" == "clean" ];then
+   rm -rf *.o
    rm -rf $PROG
 fi
 echo "All done, have fun!"

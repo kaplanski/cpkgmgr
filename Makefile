@@ -1,6 +1,6 @@
 all:
 	./build.sh
-
+install:
+	./build.sh install
 clean:
-	rm -f *.o
-	rm -f cpkgmgr
+	./build.sh clean
