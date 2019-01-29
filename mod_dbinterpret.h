@@ -8,6 +8,8 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#define UUA __attribute__((__unused__))
+
 
 void prep_workln(char workln[512], char (*pkgid)[32], \
                  char (*pkgname)[256], char (*pkgver)[32]){
@@ -122,4 +124,54 @@ if ((search == 0) && (display_all == 0))
   {return scount;}
 }
 
+extern int rem_db(char fname[512], char searchval[256]){
+
+ /* Var Init */
+ int instlldfd = -1, i = 0, fline_len = 0;
+ char buffer[32], line[512], fline[512], workln[512];
+ char UUA pkgid[32] = "", pkgname[256] = "", UUA pkgver[32] = "";
+
+ instlldfd = open(fname, O_RDWR);
+ if (instlldfd != -1)
+  {
+   while ((read(instlldfd, buffer, 1)) != 0)
+    {
+     if ((strncmp(buffer, "\n", 1)) != 0)
+      {
+       line[i] = buffer[0];
+       i++;
+      }
+     else
+      {
+       strncpy(fline, line, i);
+       fline[i] = '\0';
+       fline_len = strlen(fline);
+       if ((strncmp(fline,"{", 1) == 0) && (strncmp(fline+fline_len-1,"}", 1) == 0))
+        {
+         #ifdef DEBUG
+         printf("ArgLine!\n");
+         #endif
+
+         /* remove { and } */
+         strncpy(workln, fline+1, fline_len-1);
+         workln[fline_len-2] = '\0';
+
+         /* split by : */
+         prep_workln(workln, &pkgid, &pkgname, &pkgver);
+
+         if ((strstr(pkgname, searchval)) != NULL)
+          {
+           lseek(instlldfd, -(strlen(pkgname) + strlen(pkgid) + strlen(pkgver) + 5), SEEK_CUR);
+           write(instlldfd, "#", 1);
+          }
+        }
+       /* reset counter */
+       i = 0;
+      }
+    }
+   close(instlldfd);
+  }
+
+ return 0;
+}
 #endif

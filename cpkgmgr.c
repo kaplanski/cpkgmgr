@@ -409,12 +409,17 @@ int main(int argc, char *argv[]){
        chdir(infldr);
        if(access(argv[2], F_OK) != -1)
         {
+
+         /* physical removal */
          strcpy(syscall, "rm -rf ");
          strcat(syscall, infldr);
          strcat(syscall, "/");
          strcat(syscall, argv[2]);
          system(syscall);
-         /* todo: remove from instlld */
+
+         /* db removal */
+         rem_db(instlld, argv[2]);
+
          printf("Done!\n");
         }
        else

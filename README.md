@@ -9,7 +9,5 @@ At that point in time cpkgmgr will be renamed to pkgmgr
 
 *WIP Content:*  
 - -ri (reinstall of installed packages)  
-- -r (needs to remove entry from installed.db)  
-
   
 **cpkgmgr** is 'just' a port of pkgmgr to c
