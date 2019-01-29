@@ -6,8 +6,5 @@ At that point in time cpkgmgr will be renamed to pkgmgr
 
 *Dependencies:*  
 - wget (package download)  
-
-*WIP Content:*  
-- -i id counter (make independent of lines)  
   
 **cpkgmgr** is 'just' a port of pkgmgr to c

@@ -34,7 +34,7 @@ void prep_workln(char workln[512], char (*pkgid)[32], \
 
 extern int read_db(char fname[512], int display_all, int search, char searchval[256], char (*rval)[256]){
  /* Var Init */
- int indexfd = -1, i = 0, fline_len = 0, scount = 0, linecount = 0;
+ int indexfd = -1, i = 0, fline_len = 0, scount = 0;
  char buffer[32], line[512], fline[512], workln[512];
  char pkgid[32] = "", pkgname[256] = "", pkgver[32] = "";
 
@@ -58,7 +58,6 @@ extern int read_db(char fname[512], int display_all, int search, char searchval[
       }
      else
       {
-       linecount++;
        strncpy(fline, line, i);
        fline[i] = '\0';
        fline_len = strlen(fline);
@@ -119,7 +118,7 @@ extern int read_db(char fname[512], int display_all, int search, char searchval[
   }
 
 if ((search == 0) && (display_all == 0))
-  {return linecount;}
+  {return atoi(pkgid)+1;}
  else
   {return scount;}
 }
