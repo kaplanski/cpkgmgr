@@ -275,7 +275,7 @@ int main(int argc, char *argv[]){
  strcat(indexfile, ".db");
 
  /* most important thing first: the info */
- if ((argc > 1) && (strcmp(argv[1], "run")) == 0)
+ if (((argc > 1) && ((strcmp(argv[1], "run")) == 0)) || ((argc > 1) && ((strcmp(argv[1], "-ri")) == 0)))
   {sleep(0);}
  else
   {info();}
@@ -332,12 +332,12 @@ int main(int argc, char *argv[]){
       }
      else
       {
-       if (read_db(instlld, 1, 1, argv[2], &intmp) > 0)
+       if ((argc < 4) && (read_db(instlld, 1, 1, argv[2], &intmp) > 0))
         {
          printf("%s is already installed! (Did you mean: -ri)\n", argv[2]);
          exit(201);
         }
-       else
+       else if ((argc == 3) || (strcmp("-ri", argv[3]) == 0))
         {
          if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
           {
@@ -378,7 +378,8 @@ int main(int argc, char *argv[]){
            printf("lctmp2 = %s", lctmp2);
            #endif
 
-           instlldfd = open(instlld, O_WRONLY | O_APPEND);
+           if (argc != 4)
+            {instlldfd = open(instlld, O_WRONLY | O_APPEND);}
            if (instlldfd != -1)
             {
              write(instlldfd, lctmp2, strlen(lctmp2));
@@ -463,7 +464,7 @@ int main(int argc, char *argv[]){
    /* reinstall a (currently installed) package */
    else if ((strcmp(argv[1], "-ri")) == 0)
     {
-     /* CODE */
+     execlp(argv[0], argv[0], "-i", argv[2], "-ri", NULL);
     }
 
    /* set arch or repo */

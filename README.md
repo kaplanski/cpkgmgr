@@ -8,6 +8,6 @@ At that point in time cpkgmgr will be renamed to pkgmgr
 - wget (package download)  
 
 *WIP Content:*  
-- -ri (reinstall of installed packages)  
+- -i id counter (make independent of lines)  
   
 **cpkgmgr** is 'just' a port of pkgmgr to c
