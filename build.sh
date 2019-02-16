@@ -5,6 +5,10 @@ PROG="pkgmgr"
 PROGPATH="$HOME/$PROG"
 FLAGS="-std=gnu99 -Wall -Wextra -pedantic"
 
+if [ "$CFLAGS" != "" ]; then
+   FLAGS="$FLAGS $CFLAGS"
+fi
+
 #check if someone builds in the wrong place
 if [ "$PWD" == "$PROGPATH" -o "$PWD" == "/usr$PROGPATH" ]; then
    echo "Building inside $PROGPATH is not allowed"
