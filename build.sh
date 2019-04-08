@@ -19,7 +19,12 @@ if [ "$PWD" == "$PROGPATH" -o "$PWD" == "/usr$PROGPATH" ]; then
 fi
 
 #building procedure
-if [ "$1" == "" -o "$1" == "all" ]; then
+if [ "$1" == "help" ];then
+   echo "Usage: $0 [cmd]"
+   echo "       all: builds $PROG"
+   echo "   install: installs $PROG in $PROGPATH"
+   echo "   alias to 'all' is $0 w/o any cmd"
+elif [ "$1" == "" -o "$1" == "all" ]; then
    #set compiler
    echo "Setting compiler..."
    if [ -f /usr/bin/gcc -o -f /usr/local/bin/gcc ]; then
@@ -70,4 +75,4 @@ elif [ "$1" == "clean" ];then
    rm -rf *.o
    rm -rf $PROG
 fi
-echo "All done, have fun!"
+#echo "All done, have fun!"
