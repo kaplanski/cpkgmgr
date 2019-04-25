@@ -10,7 +10,6 @@
 #include <sys/stat.h>
 #define UUA __attribute__((__unused__))
 
-
 void prep_workln(char workln[512], char (*pkgid)[32], \
                  char (*pkgname)[256], char (*pkgver)[32]){
 
@@ -98,7 +97,7 @@ extern int read_db(char fname[512], int display_all, int search, char searchval[
          /* same as above, does not output, case sensitive, used in -i */
          else if ((search == 1) && (display_all == 1))
            {
-            if ((strstr(pkgname, searchval)) != NULL)
+            if ((strstr(pkgname, searchval)) == 0)
              {
               strcpy(*rval, pkgname);
               strcat(*rval, "_v");

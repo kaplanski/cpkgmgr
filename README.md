@@ -8,6 +8,6 @@ At that point in time cpkgmgr will be renamed to pkgmgr
 - wget (package download)  
 
 *Bugs:*  
-- package search fails if similar package (less letters name) is on the index  
+[ALL FIXED]  
   
 **cpkgmgr** is 'just' a port of pkgmgr to c

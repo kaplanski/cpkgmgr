@@ -299,8 +299,11 @@ int main(int argc, char *argv[]){
    printf("arch = %s\n", arch);
    #endif
 
+   if ((strcmp(argv[1], "test")) == 0)
+    {printf("result: %d\n", read_db(indexfile, 1, 1, argv[2], &intmp));}
+
    /* display help */
-   if ((strcmp(argv[1], "-h")) == 0)
+   else if ((strcmp(argv[1], "-h")) == 0)
     {help(argv[0], pkgfldr, infldr, arch);}
 
    /* clean ARCH folder */
