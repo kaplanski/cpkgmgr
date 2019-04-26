@@ -181,7 +181,7 @@ void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
 int main(int argc, char *argv[]){
  /* Var Init */
  int i = 0, j = 0, sup_arch = 0, cfgfd = -1, arch_set = 0, \
-     repo_set = 0, pkgverlen = 0, instlldfd = -1;
+     repo_set = 0, pkgverlen = 0, instlldfd = -1, ri = 0;
  char pkgfldr[512] = "", infldr[512] = "", archfldr[512] = "", \
       instlld[512] = "", arch[16] = "python2", repo[1024] = REPO, \
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
@@ -344,30 +344,29 @@ int main(int argc, char *argv[]){
       }
      else
       {
-       if ((argc != 4) && (read_db(instlld, 1, 1, argv[2], &intmp) > 0))
-        {
-         printf("%s is already installed! (Did you mean: -ri)\n", argv[2]);
-         exit(201);
-        }
-       else if ((argc == 4) && (strcmp("-ri", argv[3]) != 0))
-        {execlp(argv[0], argv[0], "-i", argv[2], "-ri", NULL);}
-       else if ((argc == 3) || (strcmp("-ri", argv[3]) == 0))
-        {
-         if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
-          {
-           chdir(archfldr);
-           if(access(intmp, F_OK) != -1)
-            {printf("Using cached package...\n");}
-           else
-            {
-             printf("Downloading %s... ", argv[2]);
-             fflush(stdout);
-             download(repo, arch, intmp, NULL);
-            }
+       installer:
 
-           strncpy(intmp2, intmp, strlen(intmp)-4);
-           intmp2[strlen(intmp)-3] = '\0';
-           install(intmp2, pkgfldr, infldr, argv[2]);
+       /*chk if pkg is on index*/
+       if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
+        {
+         chdir(archfldr);
+         if(access(intmp, F_OK) != -1)
+          {printf("Using cached package...\n");}
+         else
+          {
+           printf("Downloading %s... ", argv[2]);
+           fflush(stdout);
+           download(repo, arch, intmp, NULL);
+          }
+
+         strncpy(intmp2, intmp, strlen(intmp)-4);
+         intmp2[strlen(intmp)-3] = '\0';
+
+         if (ri == 1)
+          {install(intmp2, pkgfldr, infldr, argv[2], 1);}
+         else
+          {
+           install(intmp2, pkgfldr, infldr, argv[2], 0);
 
            /* add to instlld */
            /* -6 = _v + .tgz */
@@ -393,22 +392,27 @@ int main(int argc, char *argv[]){
            printf("lctmp2 = %s", lctmp2);
            #endif
 
-           if (argc != 4)
-            {instlldfd = open(instlld, O_WRONLY | O_APPEND);}
-           if (instlldfd != -1)
+           if (argc < 4)
             {
-             write(instlldfd, lctmp2, strlen(lctmp2));
-             close(instlldfd);
+             instlldfd = open(instlld, O_WRONLY | O_APPEND);
+             if (instlldfd != -1)
+              {
+               write(instlldfd, lctmp2, strlen(lctmp2));
+               close(instlldfd);
+              }
+             else
+              {
+               printf("Unable to open instlldfd! Abbort\n");
+               exit(117);
+              }
             }
-           else
-            {printf("Could not open %s!\n", instlld);}
           }
-         else
-          {
-           printf("%s was not found on the index...\n" \
-                  "Similar sounding packages:\n", argv[2]);
-           read_db(indexfile, 0, 1, argv[2], NULL);
-          }
+        }
+       else
+        {
+         printf("%s was not found on the index...\n" \
+                "Similar sounding packages:\n", argv[2]);
+         read_db(indexfile, 0, 1, argv[2], NULL);
         }
       }
     }
@@ -480,7 +484,8 @@ int main(int argc, char *argv[]){
    /* reinstall a (currently installed) package */
    else if ((strcmp(argv[1], "-ri")) == 0)
     {
-     execlp(argv[0], argv[0], "-i", argv[2], "-ri", NULL);
+     ri = 1;
+     goto installer;
     }
 
    /* set arch or repo */

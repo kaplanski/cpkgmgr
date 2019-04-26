@@ -47,7 +47,7 @@ void read_display(char archdir[512], char pkg[256], char app[64]){
   }
 }
 
-extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[64]){
+extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[64], int ri){
 
  int i = 0;
 
@@ -106,6 +106,7 @@ extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[6
   }
  else
   {
+   printf("tgz = %s\n", tgz);
    printf("[FAIL]\nArchive not present in %s!\n", archdir);
    exit(177);
   }
@@ -114,15 +115,22 @@ extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[6
   {mkdir(destdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);}
  else
   {
-   printf(">Removing previous version... ");
-   fflush(stdout);
-   strcpy(syscall, "rm -rf ");
-   strcat(syscall, destdir);
-   strcat(syscall, "/*"); /**/
-   system(syscall);
-   printf("[DONE]\n");
+   if (ri == 0)
+    {
+     printf("%s is already installed! (did you mean: -ri)\n", app);
+     exit(42);
+    }
+   else if (ri == 1)
+     {
+      printf(">Removing previous version... ");
+      fflush(stdout);
+      strcpy(syscall, "rm -rf ");
+      strcat(syscall, destdir);
+      strcat(syscall, "/*"); /**/
+      system(syscall);
+      printf("[DONE]\n");
+     }
   }
-
  /* generic install */
  printf("Installing %s... ", app);
  fflush(stdout);
