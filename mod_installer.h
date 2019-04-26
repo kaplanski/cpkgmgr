@@ -94,17 +94,19 @@ extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[6
  strcat(syscall, tgz);
 
  /* unpacking the archive */
- printf("Unpacking...\n");
+ printf("Unpacking... ");
+ fflush(stdout);
 
  chdir(archdir);
  if(access(tgz, F_OK) != -1)
   {
    system(syscall);
    chdir(pkgsrcdir);
+   printf("[DONE]\n");
   }
  else
   {
-   printf("Unpacking failed, archive not present in archfldr!\n");
+   printf("[FAIL]\nArchive not present in %s!\n", archdir);
    exit(177);
   }
 
@@ -112,16 +114,18 @@ extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[6
   {mkdir(destdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);}
  else
   {
-   printf(">Removing previous version...\n");
+   printf(">Removing previous version... ");
+   fflush(stdout);
    strcpy(syscall, "rm -rf ");
    strcat(syscall, destdir);
    strcat(syscall, "/*"); /**/
    system(syscall);
-   printf(">Done!\n");
+   printf("[DONE]\n");
   }
 
  /* generic install */
- printf("Installing %s...\n", app);
+ printf("Installing %s... ", app);
+ fflush(stdout);
 
  /* depreciated, c port of pkgmgr does execute files with endings */
  //if [ -f "$2" -o -f "$2.bin" -o -f "$2.sh" -o -f "$2.py" ]; then
@@ -161,7 +165,7 @@ extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[6
   system(syscall);
  }
 
- printf("Done installing!\n");
+ printf("[DONE]\n");
  read_display(archdir, pkg, app);
 
  /* cleanup */

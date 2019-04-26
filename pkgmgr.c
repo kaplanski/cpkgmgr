@@ -96,7 +96,7 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
  /* download Package index */
  if((access(indexf, F_OK) == -1))
   {
-   printf("Downloading index...");
+   printf("Downloading index... ");
    fflush(stdout);
    download(repo, arch, "index.db", indexf);
   }
@@ -145,7 +145,7 @@ void clean(char archdir[512]){
  strcat(syscall, archdir);
  strcat(syscall, "/*"); /**/
  system(syscall);
- printf("[Done]\n");
+ printf("[DONE]\n");
 
 }
 
@@ -160,6 +160,8 @@ void info(void){
 /* argument help */
 void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
 
+ info();
+
  printf("Usage: %s [-c|-da|-di|-h|-i|-r|-s|-u] [pkg]\n" \
         "   -c: cleans the package folder of downloaded packages\n" \
         "   -h: displays this help\n" \
@@ -168,12 +170,12 @@ void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
         "   -r [pkg]: removes a package\n" \
         "   -s [pkg]: searches for a package in the package index\n" \
         "  -da: list all available packages for %s\n" \
-        "  -di: list all installed packages for %s\n" \
+        "  -di: list all installed packages\n" \
         "setup: change your architecture or repo\n" \
         "  run: execute an installed app\n" \
         "Current binary folder: %s\n" \
         "Current pkgmgr folder: %s\n" \
-        "Current architecture: %s\n", prg, arch, arch, indir, pkgdir, arch);
+        "Current architecture: %s\n", prg, arch, indir, pkgdir, arch);
 }
 
 int main(int argc, char *argv[]){
@@ -279,20 +281,15 @@ int main(int argc, char *argv[]){
  strcat(indexfile, arch);
  strcat(indexfile, ".db");
 
- /* most important thing first: the info */
- if (((argc > 1) && ((strcmp(argv[1], "run")) == 0)) || ((argc > 3) && ((strcmp(argv[3], "-ri")) == 0)))
-  {sleep(0);}
- else
-  {info();}
-
  /* create initial folders/files */
  first_run(pkgfldr, infldr, archfldr, arch, instlld, \
            cfgfile, sup_arch, indexfile, repo);
 
  if (argc == 1)
   {
+   info();
    printf("At least one argument required!\n" \
-          "Try: %s -h (or specifiy a file)!\n", argv[0]);
+          "Try: %s -h\n", argv[0]);
   }
  else if (argc > 1)
   {
@@ -358,13 +355,13 @@ int main(int argc, char *argv[]){
         {
          if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
           {
+           chdir(archfldr);
            if(access(intmp, F_OK) != -1)
             {printf("Using cached package...\n");}
            else
             {
-             printf("Downloading %s...", argv[2]);
+             printf("Downloading %s... ", argv[2]);
              fflush(stdout);
-             chdir(archfldr);
              download(repo, arch, intmp, NULL);
             }
 
@@ -428,6 +425,8 @@ int main(int argc, char *argv[]){
        chdir(infldr);
        if(access(argv[2], F_OK) != -1)
         {
+         printf("Removing %s... ", argv[2]);
+         fflush(stdout);
 
          /* physical removal */
          strcpy(syscall, "rm -rf ");
@@ -438,8 +437,7 @@ int main(int argc, char *argv[]){
 
          /* db removal */
          rem_db(instlld, argv[2]);
-
-         printf("Done!\n");
+         printf("[DONE]\n");
         }
        else
         {

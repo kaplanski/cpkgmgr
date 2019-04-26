@@ -101,7 +101,6 @@ extern int read_db(char fname[512], int display_all, int search, char searchval[
            {
             if ((strcmp(pkgname, searchval)) == 0)
              {
-              printf("pkgname: %s\nsearchval: %s\n", pkgname, searchval);
               strcpy(*rval, pkgname);
               strcat(*rval, "_v");
               strcat(*rval, pkgver);
