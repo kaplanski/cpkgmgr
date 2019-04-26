@@ -8,6 +8,6 @@ At that point in time cpkgmgr will be renamed to pkgmgr
 - wget (package download)  
 
 *Bugs:*  
-[ALL FIXED]  
+- Another bug in read_db function at -i (FML)  
   
 **cpkgmgr** is 'just' a port of pkgmgr to c
