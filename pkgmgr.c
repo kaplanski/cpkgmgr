@@ -97,6 +97,7 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
  if((access(indexf, F_OK) == -1))
   {
    printf("Downloading index...");
+   fflush(stdout);
    download(repo, arch, "index.db", indexf);
   }
 }
