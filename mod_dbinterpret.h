@@ -97,8 +97,9 @@ extern int read_db(char fname[512], int display_all, int search, char searchval[
          /* same as above, does not output, case sensitive, used in -i */
          else if ((search == 1) && (display_all == 1))
            {
-            if ((strstr(pkgname, searchval)) == 0)
+            if ((strcmp(pkgname, searchval)) == 0)
              {
+              printf("pkgname: %s\nsearchval: %s\n", pkgname, searchval);
               strcpy(*rval, pkgname);
               strcat(*rval, "_v");
               strcat(*rval, pkgver);

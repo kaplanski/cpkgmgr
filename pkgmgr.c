@@ -94,7 +94,10 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
 
  /* download Package index */
  if((access(indexf, F_OK) == -1))
-  {download(repo, arch, "index.db", indexf);}
+  {
+   printf("Downloading index...");
+   download(repo, arch, "index.db", indexf);
+  }
 }
 
 /* execute an installed app */
@@ -135,6 +138,7 @@ void clean(char archdir[512]){
 
  char syscall[1024];
  printf("Cleaning %s... ", archdir);
+ fflush(stdout);
  strcpy(syscall, "rm -rf ");
  strcat(syscall, archdir);
  strcat(syscall, "/*"); /**/
@@ -299,11 +303,18 @@ int main(int argc, char *argv[]){
    printf("arch = %s\n", arch);
    #endif
 
+   #ifdef DEBUG
    if ((strcmp(argv[1], "test")) == 0)
     {printf("result: %d\n", read_db(indexfile, 1, 1, argv[2], &intmp));}
+   #endif
 
    /* display help */
+   #ifdef DEBUG
    else if ((strcmp(argv[1], "-h")) == 0)
+   #endif
+   #ifndef DEBUG
+   if ((strcmp(argv[1], "-h")) == 0)
+   #endif
     {help(argv[0], pkgfldr, infldr, arch);}
 
    /* clean ARCH folder */
@@ -349,7 +360,8 @@ int main(int argc, char *argv[]){
             {printf("Using cached package...\n");}
            else
             {
-             printf("Downloading %s...\n", argv[2]);
+             printf("Downloading %s...", argv[2]);
+             fflush(stdout);
              chdir(archfldr);
              download(repo, arch, intmp, NULL);
             }
@@ -461,8 +473,8 @@ int main(int argc, char *argv[]){
    else if ((strcmp(argv[1], "-u")) == 0)
     {
      printf("Updating index for %s... ", arch);
+     fflush(stdout);
      download(repo, arch, "index.db", indexfile);
-     printf("[Done]\n");
     }
 
    /* reinstall a (currently installed) package */
