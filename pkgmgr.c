@@ -16,6 +16,7 @@
 #include "mod_dbinterpret.h"
 #include "mod_installer.h"
 #include "mod_setup.h"
+#define UUA __attribute__((__unused__))
 #define PKGDIR "/pkgmgr"
 #define INDIR "/bin"
 #define ARCHDIR "/ARCH"
@@ -30,7 +31,7 @@
 /* initial creation of various folders and the instlld file */
 void first_run(char pkgdir[512], char indir[512], char archdir[512], \
                char arch[16], char instlld[512], char cfgfile[512], \
-               int sup_arch __attribute__((__unused__)), char indexf[512], char repo[1024]){
+               int sup_arch UUA, char indexf[512], char repo[1024]){
  int instlldfd = -1, cfgfd_creat = -1;
 
  /* create folders + installed db */

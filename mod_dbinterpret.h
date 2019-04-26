@@ -8,7 +8,9 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef UUA
 #define UUA __attribute__((__unused__))
+#endif
 
 void prep_workln(char workln[512], char (*pkgid)[32], \
                  char (*pkgname)[256], char (*pkgver)[32]){
