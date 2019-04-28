@@ -203,6 +203,7 @@ void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
         "   -i [pkg]: installs a package (-ri: reinstall)\n" \
         "   -r [pkg]: removes a package\n" \
         "   -s [pkg]: searches for a package in the package index\n" \
+        "  -ui [pkg]: updates a package if newer version available\n" \
         "  -da: list all available packages for %s\n" \
         "  -di: list all installed packages\n" \
         "setup: change your architecture or repo\n" \
@@ -217,12 +218,13 @@ void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
 int main(int argc, char *argv[]){
  /* Var Init */
  int i = 0, j = 0, sup_arch = 0, cfgfd = -1, arch_set = 0, \
-     repo_set = 0, pkgverlen = 0, instlldfd = -1, ri = 0;
+     repo_set = 0, pkgverlen = 0, instlldfd = -1, ri = 0, ui = 0;
  char pkgfldr[512] = "", infldr[512] = "", archfldr[512] = "", \
       instlld[512] = "", arch[16] = "python2", repo[1024] = REPO, \
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
       indexfile[512] = "", intmp[256] = "", intmp2[256] = "", syscall[1024], \
-      lctmp[12] = "", lctmp2[256] = "", pkgver[32] = "";
+      lctmp[12] = "", lctmp2[256] = "", pkgver[32] = "", \
+      pkginver[256] = "", pkgonver[256] = "";
  const char *home = getenv("HOME");
  const char *archlst[4];
  archlst[0] = "python2";
@@ -403,14 +405,16 @@ int main(int argc, char *argv[]){
 
          if (ri == 1)
           {install(intmp2, pkgfldr, infldr, argv[2], 1);}
+         else if (ui == 1)
+          {
+           install(intmp2, pkgfldr, infldr, argv[2], 2);
+           goto gen_db_entry;
+          }
          else
           {
            install(intmp2, pkgfldr, infldr, argv[2], 0);
 
-           /* skip db write when upgrading */
-           if (strcmp(argv[2], "pkgmgr") == 0)
-            {exit(0);}
-
+           gen_db_entry:
            /* add to instlld */
            /* -6 = _v + .tgz */
            pkgverlen = (strlen(intmp) - strlen(argv[2]) - 6);
@@ -532,13 +536,42 @@ int main(int argc, char *argv[]){
     }
 
    /* set arch or repo */
+   else if ((strcmp(argv[1], "-ui")) == 0)
+    {
+     if (argc < 3)
+      {printf("Usage: %s %s [pkg]\n", argv[0], argv[1]); exit(255);}
+     else
+      {
+       if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
+        {
+          if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
+           {
+            read_db(instlld, 1, 2, argv[2], &pkginver);
+            read_db(indexfile, 1, 2, argv[2], &pkgonver);
+            if (strcmp(pkginver, pkgonver) == 0)
+             {printf("%s (%s) is already up-to-date\n", argv[2], pkginver);}
+            else
+             {
+              rem_db(instlld, argv[2]);
+              ui = 1;
+              chdir(archfldr);
+              goto force_dwn;
+             }
+           }
+          else
+           {printf("%s is not available\n", argv[2]);}
+        }
+       else
+        {printf("%s is not installed! (did you mean: -i)\n", argv[2]);}
+      }
+    }
    else if ((strcmp(argv[1], "setup")) == 0)
     {editcfg(cfgfile);}
 
    /* execute an installed package */
    else if ((strcmp(argv[1], "run")) == 0)
     {
-     if (argc < 2)
+     if (argc < 3)
       {
        printf("Usage: %s %s [pkg] [app] [args]\n", argv[0], argv[1]);
        exit(222);
@@ -559,6 +592,8 @@ int main(int argc, char *argv[]){
       {
         if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
          {run_app(infldr, argv[2], NULL, argc, argv);}
+        else
+         {printf("%s was not found in %s!\n", argv[2], instlld);}
       }
     }
    else if ((strcmp(argv[1], "-v")) == 0)

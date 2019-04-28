@@ -24,7 +24,6 @@ cd cpkgmgr && ./build.sh install
   
 *Upcomming:*  
 - dependency check for packages (and auto install of deps) (priority: high)  
-- updating packages (priority: medium)  
 - repo will be restructured (priority: low)  
   
 *Bugs:*  

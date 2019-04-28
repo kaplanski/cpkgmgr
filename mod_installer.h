@@ -115,6 +115,10 @@ extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[6
       system(syscall);
       printf("[DONE]\n");
      }
+   else if (ri == 2)
+    {
+     printf(">Updating now...\n");
+    }
   }
 
  /* unpacking the archive */

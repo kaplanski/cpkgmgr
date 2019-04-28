@@ -108,6 +108,18 @@ extern int read_db(char fname[512], int display_all, int search, char searchval[
               scount++;
              }
            }
+
+         /* only write pkgver to rval, used in -ui */
+         else if ((search == 2) && (display_all == 1))
+           {
+            if ((strcmp(pkgname, searchval)) == 0)
+             {
+              strcpy(*rval, pkgver);
+              scount++;
+             }
+           }
+
+
         }
 
        /* reset counter */
