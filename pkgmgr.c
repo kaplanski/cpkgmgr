@@ -45,33 +45,20 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
  if(access(archdir, F_OK) == -1)
   {mkdir(archdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
    printf("Initial ARCHfldr created!\n");}
- #ifdef OLD
- if((access(instlld, F_OK) == -1) && (sup_arch == 1))
- #endif
- #ifndef OLD
  if (access(instlld, F_OK) == -1)
- #endif
   {
    instlldfd = open(instlld, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
    if (instlldfd != -1)
     {
-     write(instlldfd,"[PKGID:Name:Version]\n", strlen("[PKGID:Name:Version]\n"));
+     write(instlldfd,"[PKGID:Name:Version]\n{001:pkgmgr:", strlen("[PKGID:Name:Version]\n{001:pkgmgr:"));
+     write(instlldfd, VERSION, strlen(VERSION));
+     write(instlldfd,"}\n", strlen("}\n"));
      close(instlldfd);
-     #ifdef OLD
-     printf("Initial installed_%s.db created!\n", arch);
-     #endif
-     #ifndef OLD
      printf("Initial installed.db created!\n");
-     #endif
     }
    else
     {
-     #ifdef OLD
-     printf("Failed to create installed_%s.db\n", arch);
-     #endif
-     #ifndef OLD
      printf("Failed to create installed.db\n");
-     #endif
     }
   }
 
@@ -305,14 +292,7 @@ int main(int argc, char *argv[]){
 
  /* finally we can use arch in our vars */
  strcpy(instlld, pkgfldr);
- #ifdef OLD
- strcat(instlld, "/installed_");
- strcat(instlld, arch);
- strcat(instlld, ".db");
- #endif
- #ifndef OLD
  strcat(instlld, "/installed.db");
- #endif
 
  strcpy(indexfile, pkgfldr);
  strcat(indexfile, "/index_");
@@ -389,7 +369,7 @@ int main(int argc, char *argv[]){
         {
          chdir(archfldr);
          if (strcmp(argv[2], "pkgmgr") == 0)
-          {goto force_dwn;}
+          {printf("to update pkgmgr use -ui\n"); exit(255);}
          if(access(intmp, F_OK) != -1)
           {printf("Using cached package...\n");}
          else
@@ -408,6 +388,7 @@ int main(int argc, char *argv[]){
          else if (ui == 1)
           {
            install(intmp2, pkgfldr, infldr, argv[2], 2);
+           rem_db(instlld, argv[2]);
            goto gen_db_entry;
           }
          else
@@ -542,17 +523,15 @@ int main(int argc, char *argv[]){
       {printf("Usage: %s %s [pkg]\n", argv[0], argv[1]); exit(255);}
      else
       {
-       if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
+       if (read_db(instlld, 1, 2, argv[2], &pkginver) == 1)
         {
-          if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
+          if (read_db(indexfile, 1, 2, argv[2], &pkgonver) == 1)
            {
-            read_db(instlld, 1, 2, argv[2], &pkginver);
-            read_db(indexfile, 1, 2, argv[2], &pkgonver);
             if (strcmp(pkginver, pkgonver) == 0)
              {printf("%s (%s) is already up-to-date\n", argv[2], pkginver);}
             else
              {
-              rem_db(instlld, argv[2]);
+              read_db(indexfile, 1, 1, argv[2], &intmp);
               ui = 1;
               chdir(archfldr);
               goto force_dwn;
