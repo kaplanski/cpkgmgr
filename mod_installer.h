@@ -93,26 +93,11 @@ extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[6
  strcat(tgz, ".tgz");
  strcat(syscall, tgz);
 
- /* unpacking the archive */
- printf("Unpacking... ");
- fflush(stdout);
-
- chdir(archdir);
- if(access(tgz, F_OK) != -1)
-  {
-   system(syscall);
-   chdir(pkgsrcdir);
-   printf("[DONE]\n");
-  }
- else
-  {
-   printf("tgz = %s\n", tgz);
-   printf("[FAIL]\nArchive not present in %s!\n", archdir);
-   exit(177);
-  }
-
  if(access(destdir, F_OK) == -1)
-  {mkdir(destdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);}
+  {
+   if (strcmp(app, "pkgmgr") != 0)
+    {mkdir(destdir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);}
+  }
  else
   {
    if (ri == 0)
@@ -131,6 +116,25 @@ extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[6
       printf("[DONE]\n");
      }
   }
+
+ /* unpacking the archive */
+ printf("Unpacking... ");
+ fflush(stdout);
+
+ chdir(archdir);
+ if(access(tgz, F_OK) != -1)
+  {
+   system(syscall);
+   chdir(pkgsrcdir);
+   printf("[DONE]\n");
+  }
+ else
+  {
+   printf("tgz = %s\n", tgz);
+   printf("[FAIL]\nArchive not present in %s!\n", archdir);
+   exit(177);
+  }
+
  /* generic install */
  printf("Installing %s... ", app);
  fflush(stdout);
@@ -200,6 +204,11 @@ void download(char repo[1024], char arch[16], char dwfile[512], char saveas[512]
     {
      strcat(syscall, " -O ");
      strcat(syscall, saveas);
+    }
+   else
+    {
+     strcat(syscall, " -O ");
+     strcat(syscall, dwfile);
     }
    #ifdef DEBUG
    printf("syscall (download) = %s\n", syscall);

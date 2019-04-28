@@ -103,7 +103,7 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
 }
 
 /* execute an installed app */
-void run_app(char indir[512], char app[]){
+void run_app(char indir[512], char pkg[], char app[], int argc, char *argv[]){
  int i = 0, app_present = 0;
  char app_path[512] = "", tmp[512] = "";
  char *end[4];
@@ -113,7 +113,7 @@ void run_app(char indir[512], char app[]){
  end[3] = ".py";
  strcpy(app_path, indir);
  strcat(app_path, "/");
- strcat(app_path, app);
+ strcat(app_path, pkg);
  strcat(app_path, "/");
 
  if(access(app_path, F_OK) == -1)
@@ -129,7 +129,13 @@ void run_app(char indir[512], char app[]){
       {app_present = 1; break;}
     }
    if (app_present == 1)
-    {execlp(tmp, app, NULL);}
+    {
+     printf("tmp: %s\n", tmp);
+     if (argc<5)
+      {execvp(tmp, NULL);}
+     else
+      {execvp(tmp, argv + 3);}
+    }
    else
     {printf("App not present in app folder!\n"); exit(133);}
   }
@@ -350,10 +356,13 @@ int main(int argc, char *argv[]){
        if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
         {
          chdir(archfldr);
+         if (strcmp(argv[2], "pkgmgr") == 0)
+          {goto force_dwn;}
          if(access(intmp, F_OK) != -1)
           {printf("Using cached package...\n");}
          else
           {
+           force_dwn:
            printf("Downloading %s... ", argv[2]);
            fflush(stdout);
            download(repo, arch, intmp, NULL);
@@ -367,6 +376,10 @@ int main(int argc, char *argv[]){
          else
           {
            install(intmp2, pkgfldr, infldr, argv[2], 0);
+
+           /* skip db write when upgrading */
+           if (strcmp(argv[2], "pkgmgr") == 0)
+            {exit(0);}
 
            /* add to instlld */
            /* -6 = _v + .tgz */
@@ -497,13 +510,13 @@ int main(int argc, char *argv[]){
     {
      if (argc < 2)
       {
-       printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
+       printf("Usage: %s %s [pkg] [app] [args]\n", argv[0], argv[1]);
        exit(222);
       }
      else
       {
        if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
-        {run_app(infldr, argv[2]);}
+        {run_app(infldr, argv[2], argv[3], argc, argv);}
        else
         {printf("%s was not found in %s!\n", argv[2], instlld);}
       }

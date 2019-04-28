@@ -6,7 +6,7 @@ At that point in time cpkgmgr will be renamed to pkgmgr
 
 *Dependencies:*  
 - wget (package download)  
-
+  
 *Bugs:*  
 - [ALL FIXED]  
   
