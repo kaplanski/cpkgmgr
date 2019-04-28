@@ -188,7 +188,7 @@ extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[6
 
 void download(char repo[1024], char arch[16], char dwfile[512], char saveas[512]){
 
- if (system("ping 8.8.8.8 -c 1 -t 5 1>/dev/null 2>/dev/null") != 0)
+ if (system("ping 8.8.8.8 -c 1 1>/dev/null 2>/dev/null") != 0)
   {printf("[FAIL]\nCheck network connection!\n");}
  else
   {
