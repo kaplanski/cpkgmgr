@@ -1,5 +1,5 @@
 /*
- pkgmgr - a port of pkgmgr to c
+ pkgmgr - a lightweight package manager
  Copyright (c) 2019 Jan-Daniel Kaplanski
  MIT/X11 LICENSE
 */
@@ -17,6 +17,7 @@
 #include "mod_installer.h"
 #include "mod_setup.h"
 #define UUA __attribute__((__unused__))
+#define VERSION "0.9-rc"
 #define PKGDIR "/pkgmgr"
 #define INDIR "/bin"
 #define ARCHDIR "/ARCH"
@@ -179,7 +180,7 @@ void clean(char archdir[512]){
 /* just an info display */
 void info(void){
  printf("+-----------------------------------------------+\n" \
-        "|             pkgmgr - pkgmgr in c              |\n" \
+        "|    pkgmgr  - a lightweight package manager    |\n" \
         "|    Copyright (c) 2019 Jan-Daniel Kaplanski    |\n" \
         "+-----------------------------------------------+\n\n");
 }
@@ -190,8 +191,9 @@ void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
  info();
 
  printf("Usage: %s [-c|-da|-di|-h|-i|-r|-s|-u] [pkg]\n" \
-        "   -c: cleans the package folder of downloaded packages\n" \
         "   -h: displays this help\n" \
+        "   -v: prints version\n" \
+        "   -c: cleans the package folder of downloaded packages\n" \
         "   -u: updates the package index\n" \
         "   -i [pkg]: installs a package (-ri: reinstall)\n" \
         "   -r [pkg]: removes a package\n" \
@@ -203,7 +205,8 @@ void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
         "  list [pkg]: list all apps of a package\n" \
         "Current binary folder: %s\n" \
         "Current pkgmgr folder: %s\n" \
-        "Current architecture: %s\n", prg, arch, indir, pkgdir, arch);
+        "Current architecture: %s\n\n", prg, arch, indir, pkgdir, arch);
+ printf("Who needs root when you are %s?\n", getenv("USER"));
 }
 
 int main(int argc, char *argv[]){
@@ -552,6 +555,12 @@ int main(int argc, char *argv[]){
         if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
          {run_app(infldr, argv[2], NULL, argc, argv);}
       }
+    }
+   else if ((strcmp(argv[1], "-v")) == 0)
+    {
+     printf("pkgmgr %s - a lightweight package manager\n" \
+            "Copyright (c) 2019 Jan-Daniel Kaplanski\n" \
+            "MIT/X11 LICENSE\n", VERSION);
     }
    else
     {printf("Unknown option!\n");}
