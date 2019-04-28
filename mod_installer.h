@@ -194,7 +194,7 @@ void download(char repo[1024], char arch[16], char dwfile[512], char saveas[512]
   {
    char syscall[4096] = "";
 
-   strcpy(syscall, "wget -q -t 1 ");
+   strcpy(syscall, "wget -q -t 1 --show-progress ");
    strcat(syscall, repo);
    strcat(syscall, "/");
    strcat(syscall, arch);
