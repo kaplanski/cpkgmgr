@@ -105,7 +105,7 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
 /* execute an installed app */
 void run_app(char indir[512], char pkg[], char app[], int argc, char *argv[]){
  int i = 0, app_present = 0;
- char app_path[512] = "", tmp[512] = "";
+ char app_path[512] = "", tmp[512] = "", syscall[1024];
  char *end[4];
  end[0] = "";
  end[1] = ".sh";
@@ -120,25 +120,46 @@ void run_app(char indir[512], char pkg[], char app[], int argc, char *argv[]){
   {printf("App %s is not installed!\n", app);}
  else
   {
-   for (i = 0; i < (int)(sizeof(end)/sizeof(*end)); i++)
+   if (strcmp(argv[1], "list") == 0)
     {
-     strcpy(tmp, app_path);
-     strcat(tmp, app);
-     strcat(tmp, end[i]);
-     if(access(tmp, F_OK) != -1)
-      {app_present = 1; break;}
+     for (i = 1; i < (int)(sizeof(end)/sizeof(*end)); i++)
+      {
+       strcpy(syscall, "cd ");
+       strcat(syscall, app_path);
+       strcat(syscall, " && ls -1 *");
+       strcat(syscall, end[i]);
+       #ifndef NO_AWK
+       strcat(syscall, "  2>/dev/null | awk -F. '{print $1}'");
+       #endif
+       #ifdef NO_AWK
+       strcat(syscall, "  2>/dev/null");
+       #endif
+       system(syscall);
+      }
+     exit(0);
     }
-   if (app_present == 1)
+   else if (strcmp(argv[1], "run") == 0)
     {
-     printf("tmp: %s\n", tmp);
-     if (argc<5)
-      {execvp(tmp, NULL);}
-     else
-      {execvp(tmp, argv + 3);}
+     for (i = 0; i < (int)(sizeof(end)/sizeof(*end)); i++)
+      {
+       strcpy(tmp, app_path);
+       strcat(tmp, app);
+       strcat(tmp, end[i]);
+       if(access(tmp, F_OK) != -1)
+        {app_present = 1; break;}
+      }
     }
+  }
+
+  if (app_present == 1)
+   {
+    if (argc<5)
+     {execvp(tmp, NULL);}
+    else
+     {execvp(tmp, argv + 3);}
+   }
    else
     {printf("App not present in app folder!\n"); exit(133);}
-  }
 }
 
 /* clean the ARCH folder */
@@ -178,7 +199,8 @@ void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
         "  -da: list all available packages for %s\n" \
         "  -di: list all installed packages\n" \
         "setup: change your architecture or repo\n" \
-        "  run: execute an installed app\n" \
+        "  run [pkg] [app] [args]: execute an installed app\n" \
+        "  list [pkg]: list all apps of a package\n" \
         "Current binary folder: %s\n" \
         "Current pkgmgr folder: %s\n" \
         "Current architecture: %s\n", prg, arch, indir, pkgdir, arch);
@@ -519,6 +541,16 @@ int main(int argc, char *argv[]){
         {run_app(infldr, argv[2], argv[3], argc, argv);}
        else
         {printf("%s was not found in %s!\n", argv[2], instlld);}
+      }
+    }
+   else if ((strcmp(argv[1], "list")) == 0)
+    {
+     if (argc != 3)
+      {printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);}
+     else
+      {
+        if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
+         {run_app(infldr, argv[2], NULL, argc, argv);}
       }
     }
    else

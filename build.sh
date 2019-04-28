@@ -22,9 +22,11 @@ fi
 if [ "$1" == "help" ];then
    echo "Usage: $0 [cmd]"
    echo "       all: builds $PROG"
+   echo "     noawk: builds $PROG without awk used in list function"
    echo "   install: installs $PROG in $PROGPATH"
+   echo "     clean: cleans the build dir"
    echo "   alias to 'all' is $0 w/o any cmd"
-elif [ "$1" == "" -o "$1" == "all" ]; then
+elif [ "$1" == "" -o "$1" == "all" -o "$1" == "noawk" ]; then
    #set compiler
    echo "Setting compiler..."
    if [ -f /usr/bin/gcc -o -f /usr/local/bin/gcc ]; then
@@ -45,6 +47,10 @@ elif [ "$1" == "" -o "$1" == "all" ]; then
       echo "   wget was not found on your system"
       echo "   Please install wget to use $PROG!"
       exit 177
+   fi
+   if [ "$1" == "noawk" -o ! -f /usr/bin/awk -a ! -f /usr/local/bin/awk ]; then
+      echo "   not using awk"
+      FLAGS="$FLAGS -DNO_AWK"
    fi
    echo "   DONE"
 
