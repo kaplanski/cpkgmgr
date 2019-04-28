@@ -141,6 +141,11 @@ void run_app(char indir[512], char pkg[], char app[], int argc, char *argv[]){
     }
    else if (strcmp(argv[1], "run") == 0)
     {
+     if (argc<4)
+      {
+       printf("Usage: %s %s [pkg] [app]", argv[0], argv[1]);
+       exit(255);
+      }
      for (i = 0; i < (int)(sizeof(end)/sizeof(*end)); i++)
       {
        strcpy(tmp, app_path);
