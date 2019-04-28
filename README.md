@@ -26,6 +26,6 @@ git clone https://gitup.uni-potsdam.de/kaplanski/cpkgmgr.git
 - repo will be restructured (priority: low)  
   
 *Bugs:*  
-- removal of packages from database: same as in bugfix commit f2686bdf and 11267877 in mod_dbinterpret.h  
+no known bugs  
   
 **pkgmgr** Who needs root when you are $USER?

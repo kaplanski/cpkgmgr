@@ -159,7 +159,7 @@ extern int rem_db(char fname[512], char searchval[256]){
          /* split by : */
          prep_workln(workln, &pkgid, &pkgname, &pkgver);
 
-         if ((strstr(pkgname, searchval)) != NULL)
+         if ((strcmp(pkgname, searchval)) == 0)
           {
            lseek(instlldfd, -(strlen(pkgname) + strlen(pkgid) + strlen(pkgver) + 5), SEEK_CUR);
            write(instlldfd, "#", 1);
