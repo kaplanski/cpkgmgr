@@ -29,15 +29,19 @@ if [ "$1" == "help" ];then
 elif [ "$1" == "" -o "$1" == "all" -o "$1" == "noawk" ]; then
    #set compiler
    echo "Setting compiler..."
-   if [ -f /usr/bin/gcc -o -f /usr/local/bin/gcc ]; then
-      CC=gcc
-      echo "   using gcc"
-   elif [ -f /usr/bin/clang -o -f /usr/local/bin/clang ]; then
-      CC=clang
-      echo "   using clang"
+   if [ "$CC" == "" ]; then
+      if [ -f /usr/bin/gcc -o -f /usr/local/bin/gcc ]; then
+         CC=gcc
+         echo "   using gcc"
+      elif [ -f /usr/bin/clang -o -f /usr/local/bin/clang ]; then
+         CC=clang
+         echo "   using clang"
+      else
+         echo "   Neither clang nor gcc was found on your system!"
+         exit 255
+      fi
    else
-      echo "   Neither clang nor gcc was found on your system!"
-      exit 255
+      echo "   using $CC (manually set)"
    fi
    echo "   DONE"
 
