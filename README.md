@@ -15,7 +15,7 @@ without needing root access or changing the system.
 
 *Installation:*  
 git clone https://gitup.uni-potsdam.de/kaplanski/cpkgmgr.git  
-./build.sh install  
+cd cpkgmgr && ./build.sh install  
   
 *Dependencies:*  
 - wget (package download)  
