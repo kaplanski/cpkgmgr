@@ -51,6 +51,13 @@ elif [ "$1" == "" -o "$1" == "all" -o "$1" == "noawk" ]; then
       echo "   wget was not found on your system"
       echo "   Please install wget to use $PROG!"
       exit 177
+   else
+      wgetver=$(wget --version | grep "Wget 1.1" | cut -d " " -f 3 | cut -d "." -f 2)
+      if (($wgetver < 16 )); then
+          echo "   wget version below 1.16"
+          echo "   formated wget output disabled"
+          FLAGS="$FLAGS -DOLD_WGET"
+      fi
    fi
    if [ "$1" == "noawk" -o ! -f /usr/bin/awk -a ! -f /usr/local/bin/awk ]; then
       echo "   not using awk"
