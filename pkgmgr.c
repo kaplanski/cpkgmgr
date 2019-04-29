@@ -169,47 +169,44 @@ void handle_deps(char prog[], char indexf[512], char instlldf[512], char pkgdeps
  char fname1[512] = "", fname2[512] = "", fname3[512] = "", \
       installme[] = "", *workln_ptr;
 
- if (strlen(pkgdeps) < 0)
+ /* get list length */
+ while ((tmp = strstr(tmp, ",")))
+  {ln_len++; tmp++;}
+
+ workln_ptr = strtok(pkgdeps, ",");
+
+ for (i=0; i<ln_len; i++)
   {
-   /* get list length */
-   while ((tmp = strstr(tmp, ",")))
-    {ln_len++; tmp++;}
+   strcpy(fname1, "/bin/");
+   strcpy(fname2, "/usr/bin/");
+   strcpy(fname3, "/usr/local/bin/");
+   strcat(fname1, workln_ptr);
+   strcat(fname2, workln_ptr);
+   strcat(fname3, workln_ptr);
 
-   workln_ptr = strtok(pkgdeps, ",");
-
-   for (i=0; i<ln_len; i++)
+   if ((access(fname1, F_OK) != -1) || (access(fname2, F_OK) != -1) || (access(fname3, F_OK)) != -1)
+    {printf(" >dependency %s natively present\n", workln_ptr);}
+   else if (read_db(instlldf, 1, 1, workln_ptr, NULL, NULL) == 1)
+    {printf(" >dependency %s present\n", workln_ptr);}
+   else
     {
-     strcpy(fname1, "/bin/");
-     strcpy(fname2, "/usr/bin/");
-     strcpy(fname3, "/usr/local/bin/");
-     strcat(fname1, workln_ptr);
-     strcat(fname2, workln_ptr);
-     strcat(fname3, workln_ptr);
-
-     if ((access(fname1, F_OK) != -1) || (access(fname2, F_OK) != -1) || (access(fname3, F_OK)) != -1)
-      {printf(" >dependency %s natively present\n", workln_ptr);}
-     else if (read_db(instlldf, 1, 1, workln_ptr, NULL, NULL) == 1)
-      {printf(" >dependency %s present\n", workln_ptr);}
-     else
+     if (read_db(indexf, 1, 1, workln_ptr, NULL, NULL) == 1)
       {
-       if (read_db(indexf, 1, 1, workln_ptr, NULL, NULL) == 1)
-        {
-         strcat(installme, prog);
-         strcat(installme, " -i ");
-         strcat(installme, workln_ptr);
-         strcat(installme, ";");
-         printf(" >dependency %s marked to be installed\n", workln_ptr);
-        }
-       else
-        {printf(" >dependency %s not found. abort\n", workln_ptr); exit(137);}
+       strcat(installme, prog);
+       strcat(installme, " -i ");
+       strcat(installme, workln_ptr);
+       strcat(installme, ";");
+       printf(" >dependency %s marked to be installed\n", workln_ptr);
       }
-     workln_ptr = strtok(NULL, ",");
+     else
+      {printf(" >dependency %s not found. abort\n", workln_ptr); exit(137);}
     }
-   if (strlen(installme) > 0)
-    {
-     system(installme);
-     printf("dependencies installed");
-    }
+   workln_ptr = strtok(NULL, ",");
+  }
+ if (strlen(installme) > 0)
+  {
+   system(installme);
+   printf("dependencies installed");
   }
 }
 
@@ -501,7 +498,7 @@ int main(int argc, char *argv[]){
        printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
        exit(222);
       }
-     else if (read_db(instlld, 1, 1, argv[2], &intmp, NULL) == 1)
+     else if (read_db(instlld, 1, 1, argv[2], &intmp, &indeps) == 1)
       {
        chdir(infldr);
        if(access(argv[2], F_OK) != -1)
