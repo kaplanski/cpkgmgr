@@ -28,15 +28,18 @@ void prep_workln(char workln[512], char (*pkgid)[32], char (*pkgname)[256], \
 
  for (i=0; i<ln_len; i++)
   {
-   if (i == 0)
-    {strcpy(*pkgid, workln_ptr);}
-   else if (i == 1)
-    {strcpy(*pkgname, workln_ptr);}
-   else if (i == 2)
-    {strcpy(*pkgver, workln_ptr);}
-   else if (i == 3)
-    {strcpy(*pkgdeps, workln_ptr);}
-   workln_ptr = strtok(NULL, ":");
+   if (workln_ptr != NULL)
+    {
+     if (i == 0)
+      {strcpy(*pkgid, workln_ptr);}
+     else if (i == 1)
+      {strcpy(*pkgname, workln_ptr);}
+     else if (i == 2)
+      {strcpy(*pkgver, workln_ptr);}
+     else if (i == 3)
+      {strcpy(*pkgdeps, workln_ptr);}
+     workln_ptr = strtok(NULL, ":");
+    }
   }
 }
 
