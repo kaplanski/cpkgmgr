@@ -161,13 +161,13 @@ void clean(char archdir[512]){
 }
 
 /* handle dependencies */
-void handle_deps(char prog[], char indexf[512], char instlldf[512], char pkgdeps[4096]){
+void handle_deps(char pkgdir[512], char *prog[], char indexf[512], char instlldf[512], char pkgdeps[4096]){
 
  /* var init */
  int i = 0, ln_len = 1;
  const char *tmp = pkgdeps;
  char fname1[512] = "", fname2[512] = "", fname3[512] = "", \
-      installme[] = "", *workln_ptr, tem[4096] = "";
+      installme[10240] = "", *workln_ptr, tem[4096] = "", tem2[256] = "";
 
  /* get list length */
  while ((tmp = strstr(tmp, ",")))
@@ -186,13 +186,14 @@ void handle_deps(char prog[], char indexf[512], char instlldf[512], char pkgdeps
 
    if ((access(fname1, F_OK) != -1) || (access(fname2, F_OK) != -1) || (access(fname3, F_OK)) != -1)
     {printf(" >dependency %s natively present\n", workln_ptr);}
-   else if (read_db(instlldf, 1, 1, workln_ptr, NULL, &tem) == 1)
+   else if (read_db(instlldf, 1, 1, workln_ptr, &tem2, &tem) == 1)
     {printf(" >dependency %s present\n", workln_ptr);}
    else
     {
-     if (read_db(indexf, 1, 1, workln_ptr, NULL, &tem) == 1)
+     if (read_db(indexf, 1, 1, workln_ptr, &tem2, &tem) == 1)
       {
-       strcat(installme, prog);
+       strcat(installme, pkgdir);
+       strcat(installme, *prog+1);
        strcat(installme, " -i ");
        strcat(installme, workln_ptr);
        strcat(installme, ";");
@@ -205,6 +206,7 @@ void handle_deps(char prog[], char indexf[512], char instlldf[512], char pkgdeps
   }
  if (strlen(installme) > 0)
   {
+   printf("installme: %s\n", installme);
    system(installme);
    printf("dependencies installed");
   }
@@ -413,7 +415,7 @@ int main(int argc, char *argv[]){
 
          /* dependency phase */
          printf("Checking dependencies...\n");
-         handle_deps(argv[0], indexfile, instlld, indeps);
+         handle_deps(pkgfldr, &argv[0], indexfile, instlld, indeps);
 
          /* package phase */
          if(access(intmp, F_OK) != -1)
