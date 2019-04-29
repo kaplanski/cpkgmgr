@@ -12,16 +12,21 @@
 #define UUA __attribute__((__unused__))
 #endif
 
-void prep_workln(char workln[512], char (*pkgid)[32], \
-                 char (*pkgname)[256], char (*pkgver)[32]){
+void prep_workln(char workln[512], char (*pkgid)[32], char (*pkgname)[256], \
+                 char (*pkgver)[32], char (*pkgdeps)[4096]){
 
  /* Var Init */
- int i = 0;
+ int i = 0, ln_len = 1;
  char *workln_ptr;
+ const char *tmp = workln;
+
+ /* get workln length */
+ while ((tmp = strstr(tmp, ":")))
+  {ln_len++; tmp++;}
 
  workln_ptr = strtok(workln, ":");
 
- for (i=0; i<3; i++)
+ for (i=0; i<ln_len; i++)
   {
    if (i == 0)
     {strcpy(*pkgid, workln_ptr);}
@@ -29,27 +34,25 @@ void prep_workln(char workln[512], char (*pkgid)[32], \
     {strcpy(*pkgname, workln_ptr);}
    else if (i == 2)
     {strcpy(*pkgver, workln_ptr);}
+   else if (i == 3)
+    {strcpy(*pkgdeps, workln_ptr);}
    workln_ptr = strtok(NULL, ":");
   }
 }
 
-extern int read_db(char fname[512], int display_all, int search, char searchval[256], char (*rval)[256]){
+extern int read_db(char fname[512], int display_all, int search, \
+                   char searchval[256], char (*rval)[256], char (*rdeps)[4096]){
  /* Var Init */
  int indexfd = -1, i = 0, fline_len = 0, scount = 0;
  char buffer[32], line[512], fline[512], workln[512];
- char pkgid[32] = "", pkgname[256] = "", pkgver[32] = "";
+ char pkgid[32] = "", pkgname[256] = "", pkgver[32] = "", \
+      pkgdeps[4096] = "";
 
  /* open file */
  indexfd = open(fname, O_RDONLY);
 
  if (indexfd != -1)
   {
-   /*
-   if ((display_all == 1) || (search == 1))
-    {
-     printf("Name - Version:\n");
-    }
-   */
    while ((read(indexfd, buffer, 1)) != 0)
     {
      if ((strncmp(buffer, "\n", 1)) != 0)
@@ -83,7 +86,7 @@ extern int read_db(char fname[512], int display_all, int search, char searchval[
          workln[fline_len-2] = '\0';
 
          /* split by : */
-         prep_workln(workln, &pkgid, &pkgname, &pkgver);
+         prep_workln(workln, &pkgid, &pkgname, &pkgver, &pkgdeps);
 
          /* printout the whole list */
          if ((display_all == 1) && (search == 0))
@@ -105,6 +108,7 @@ extern int read_db(char fname[512], int display_all, int search, char searchval[
               strcat(*rval, "_v");
               strcat(*rval, pkgver);
               strcat(*rval, ".tgz");
+              strcpy(*rdeps, pkgdeps);
               scount++;
              }
            }
@@ -118,8 +122,6 @@ extern int read_db(char fname[512], int display_all, int search, char searchval[
               scount++;
              }
            }
-
-
         }
 
        /* reset counter */
@@ -169,7 +171,7 @@ extern int rem_db(char fname[512], char searchval[256]){
          workln[fline_len-2] = '\0';
 
          /* split by : */
-         prep_workln(workln, &pkgid, &pkgname, &pkgver);
+         prep_workln(workln, &pkgid, &pkgname, &pkgver, NULL);
 
          if ((strcmp(pkgname, searchval)) == 0)
           {

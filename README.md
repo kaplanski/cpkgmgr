@@ -11,8 +11,9 @@ without needing root access or changing the system.
 - list and run installed apps  
 - change repo and architecture  
   - repo: https://gitup.uni-potsdam.de/kaplanski/pkgmgr/tree/master/repo  
-  - arch: python2, python3, i386, amd64  
-- "pkgmgr -i pkgmgr" grabs the newest version, compiles and replaces the current  
+  - arch: stable  
+- dependency checks  
+- "pkgmgr -ui pkgmgr" grabs the newest version, compiles and replaces the current  
 
 *Installation:*  
 git clone https://gitup.uni-potsdam.de/kaplanski/cpkgmgr.git  
@@ -23,7 +24,6 @@ cd cpkgmgr && ./build.sh install
 - awk (optional - formats output of 'list' function)  
   
 *Upcomming:*  
-- dependency check for packages (and auto install of deps) (priority: high)  
 - repo will be restructured (priority: low)  
   
 *Bugs:*  

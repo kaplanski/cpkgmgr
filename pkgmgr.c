@@ -163,6 +163,58 @@ void clean(char archdir[512]){
 
 }
 
+/* handle dependencies */
+void handle_deps(char prog[], char indexf[512], char instlldf[512], char pkgdeps[4096]){
+
+ /* var init */
+ int i = 0, ln_len = 1;
+ const char *tmp = pkgdeps;
+ char fname1[512] = "", fname2[512] = "", fname3[512] = "", \
+      installme[] = "", *workln_ptr;
+
+ /* get list length */
+ while ((tmp = strstr(tmp, ",")))
+  {ln_len++; tmp++;}
+
+ workln_ptr = strtok(pkgdeps, ",");
+
+ for (i=0; i<ln_len; i++)
+  {
+   strcpy(fname1, "/bin/");
+   strcpy(fname2, "/usr/bin/");
+   strcpy(fname3, "/usr/local/bin/");
+   strcat(fname1, workln_ptr);
+   strcat(fname2, workln_ptr);
+   strcat(fname3, workln_ptr);
+
+   if ((access(fname1, F_OK) != -1) || (access(fname2, F_OK) != -1) || (access(fname3, F_OK)) != -1)
+    {printf(" >dependency %s natively present\n", workln_ptr);}
+   else if (read_db(instlldf, 1, 1, workln_ptr, NULL, NULL) == 1)
+    {printf(" >dependency %s present\n", workln_ptr);}
+   else
+    {
+     if (read_db(indexf, 1, 1, workln_ptr, NULL, NULL) == 1)
+      {
+       strcat(installme, prog);
+       strcat(installme, " -i ");
+       strcat(installme, workln_ptr);
+       strcat(installme, ";");
+       printf(" >dependency %s marked to be installed\n", workln_ptr);
+      }
+     else
+      {printf(" >dependency %s not found. abort\n", workln_ptr); exit(137);}
+    }
+   workln_ptr = strtok(NULL, ",");
+  }
+ if (strlen(installme) > 0)
+  {
+   system(installme);
+   printf("dependencies installed");
+  }
+}
+
+
+
 /* just an info display */
 void info(void){
  printf("+-----------------------------------------------+\n" \
@@ -204,7 +256,7 @@ int main(int argc, char *argv[]){
       instlld[512] = "", arch[16] = "python2", repo[1024] = REPO, \
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
       indexfile[512] = "", intmp[256] = "", intmp2[256] = "", syscall[1024], \
-      lctmp[12] = "", lctmp2[256] = "", pkgver[32] = "", \
+      lctmp[12] = "", lctmp2[256] = "", pkgver[32] = "", indeps[4096] = "", \
       pkginver[256] = "", pkgonver[256] = "";
  const char *home = getenv("HOME");
  const char *archlst[4];
@@ -316,7 +368,7 @@ int main(int argc, char *argv[]){
 
    #ifdef DEBUG
    if ((strcmp(argv[1], "test")) == 0)
-    {printf("result: %d\n", read_db(indexfile, 1, 1, argv[2], &intmp));}
+    {printf("result: %d\n", read_db(indexfile, 1, 1, argv[2], &intmp, &indeps));}
    #endif
 
    /* display help */
@@ -336,14 +388,14 @@ int main(int argc, char *argv[]){
    else if ((strcmp(argv[1], "-da")) == 0)
     {
      printf("Available Packages:\n");
-     read_db(indexfile, 1, 0, NULL, NULL);
+     read_db(indexfile, 1, 0, NULL, NULL, NULL);
     }
 
    /* display all installed packages */
    else if ((strcmp(argv[1], "-di")) == 0)
     {
      printf("Installed Packages:\n");
-     read_db(instlld, 1, 0, NULL, NULL);
+     read_db(instlld, 1, 0, NULL, NULL, NULL);
     }
 
    /* install a new package */
@@ -359,11 +411,17 @@ int main(int argc, char *argv[]){
        installer:
 
        /*chk if pkg is on index*/
-       if (read_db(indexfile, 1, 1, argv[2], &intmp) == 1)
+       if (read_db(indexfile, 1, 1, argv[2], &intmp, &indeps) == 1)
         {
          chdir(archfldr);
          if (strcmp(argv[2], "pkgmgr") == 0)
           {printf("to update pkgmgr use -ui\n"); exit(255);}
+
+         /* dependency phase */
+         printf("Checking dependencies...\n");
+         handle_deps(argv[0], indexfile, instlld, indeps);
+
+         /* package phase */
          if(access(intmp, F_OK) != -1)
           {printf("Using cached package...\n");}
          else
@@ -398,7 +456,7 @@ int main(int argc, char *argv[]){
 
            /* generate the entry */
            /* get new ID via line count */
-           sprintf(lctmp, "%d", read_db(instlld, 0, 0, NULL, NULL));
+           sprintf(lctmp, "%d", read_db(instlld, 0, 0, NULL, NULL, NULL));
            if (strlen(lctmp) > 1)
             {strcpy(lctmp2, "{0");}
            else
@@ -434,7 +492,7 @@ int main(int argc, char *argv[]){
         {
          printf("%s was not found on the index...\n" \
                 "Similar sounding packages:\n", argv[2]);
-         read_db(indexfile, 0, 1, argv[2], NULL);
+         read_db(indexfile, 0, 1, argv[2], NULL, NULL);
         }
       }
     }
@@ -446,7 +504,7 @@ int main(int argc, char *argv[]){
        printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);
        exit(222);
       }
-     else if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
+     else if (read_db(instlld, 1, 1, argv[2], &intmp, NULL) == 1)
       {
        chdir(infldr);
        if(access(argv[2], F_OK) != -1)
@@ -469,14 +527,14 @@ int main(int argc, char *argv[]){
         {
          printf("%s was not found in %s!\n" \
                 "Similar sounding packages:\n", argv[2], infldr);
-         read_db(instlld, 0, 1, argv[2], NULL);
+         read_db(instlld, 0, 1, argv[2], NULL, NULL);
         }
       }
      else
       {
        printf("%s was not found on the index...\n" \
               "Similar sounding packages:\n", argv[2]);
-       read_db(instlld, 0, 1, argv[2], NULL);
+       read_db(instlld, 0, 1, argv[2], NULL, NULL);
       }
     }
 
@@ -491,7 +549,7 @@ int main(int argc, char *argv[]){
      else
       {
        printf("Search Result:\n");
-       read_db(indexfile, 0, 1, argv[2], NULL);
+       read_db(indexfile, 0, 1, argv[2], NULL, NULL);
       }
     }
 
@@ -517,15 +575,15 @@ int main(int argc, char *argv[]){
       {printf("Usage: %s %s [pkg]\n", argv[0], argv[1]); exit(255);}
      else
       {
-       if (read_db(instlld, 1, 2, argv[2], &pkginver) == 1)
+       if (read_db(instlld, 1, 2, argv[2], &pkginver, NULL) == 1)
         {
-          if (read_db(indexfile, 1, 2, argv[2], &pkgonver) == 1)
+          if (read_db(indexfile, 1, 2, argv[2], &pkgonver, NULL) == 1)
            {
             if (strcmp(pkginver, pkgonver) == 0)
              {printf("%s (%s) is already up-to-date\n", argv[2], pkginver);}
             else
              {
-              read_db(indexfile, 1, 1, argv[2], &intmp);
+              read_db(indexfile, 1, 1, argv[2], &intmp, &indeps);
               ui = 1;
               chdir(archfldr);
               goto force_dwn;
@@ -551,7 +609,7 @@ int main(int argc, char *argv[]){
       }
      else
       {
-       if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
+       if (read_db(instlld, 1, 1, argv[2], &intmp, NULL) == 1)
         {run_app(infldr, argv[2], argv[3], argc, argv);}
        else
         {printf("%s was not found in %s!\n", argv[2], instlld);}
@@ -563,7 +621,7 @@ int main(int argc, char *argv[]){
       {printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);}
      else
       {
-        if (read_db(instlld, 1, 1, argv[2], &intmp) == 1)
+        if (read_db(instlld, 1, 1, argv[2], &intmp, NULL) == 1)
          {run_app(infldr, argv[2], NULL, argc, argv);}
         else
          {printf("%s was not found in %s!\n", argv[2], instlld);}
