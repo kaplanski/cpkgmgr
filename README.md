@@ -24,7 +24,7 @@ cd cpkgmgr && ./build.sh install
 - awk (optional - formats output of 'list' function)  
   
 *Upcomming:*  
-- repo will be restructured (priority: low)  
+- repo will receive some more packages  
   
 *Bugs:*  
 no known bugs  
