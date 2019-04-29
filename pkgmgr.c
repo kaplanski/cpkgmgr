@@ -23,12 +23,6 @@
 #define ARCHDIR "/ARCH"
 #define REPO "https://gitup.uni-potsdam.de/kaplanski/pkgmgr/raw/master/repo"
 
-/* Turn on debug/verbose output */
-//#define DEBUG
-
-/* Revert back from installed.db to old installed_$arch.db */
-//#define OLD
-
 /* initial creation of various folders and the instlld file */
 void first_run(char pkgdir[512], char indir[512], char archdir[512], \
                char arch[16], char instlld[512], char cfgfile[512], \

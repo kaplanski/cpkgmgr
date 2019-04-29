@@ -23,10 +23,11 @@ if [ "$1" == "help" ];then
    echo "Usage: $0 [cmd]"
    echo "       all: builds $PROG"
    echo "     noawk: builds $PROG without awk used in list function"
+   echo "     debug: builds $PROG with debug output enabled"
    echo "   install: installs $PROG in $PROGPATH"
    echo "     clean: cleans the build dir"
    echo "   alias to 'all' is $0 w/o any cmd"
-elif [ "$1" == "" -o "$1" == "all" -o "$1" == "noawk" ]; then
+elif [ "$1" == "" -o "$1" == "all" -o "$1" == "noawk" -o "$1" == "debug" ]; then
    #set compiler
    echo "Setting compiler..."
    if [ "$CC" == "" ]; then
@@ -64,6 +65,12 @@ elif [ "$1" == "" -o "$1" == "all" -o "$1" == "noawk" ]; then
       FLAGS="$FLAGS -DNO_AWK"
    fi
    echo "   DONE"
+
+   #debug output
+   if [ "$1" == "debug" ]; then
+      echo "   debug output enabled"
+      FLAGS="$FLAGS -DDEBUG"
+   fi
 
    #it's showtime
    echo
