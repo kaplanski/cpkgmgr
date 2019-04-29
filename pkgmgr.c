@@ -167,7 +167,7 @@ void handle_deps(char prog[], char indexf[512], char instlldf[512], char pkgdeps
  int i = 0, ln_len = 1;
  const char *tmp = pkgdeps;
  char fname1[512] = "", fname2[512] = "", fname3[512] = "", \
-      installme[] = "", *workln_ptr;
+      installme[] = "", *workln_ptr, tem[4096] = "";
 
  /* get list length */
  while ((tmp = strstr(tmp, ",")))
@@ -186,11 +186,11 @@ void handle_deps(char prog[], char indexf[512], char instlldf[512], char pkgdeps
 
    if ((access(fname1, F_OK) != -1) || (access(fname2, F_OK) != -1) || (access(fname3, F_OK)) != -1)
     {printf(" >dependency %s natively present\n", workln_ptr);}
-   else if (read_db(instlldf, 1, 1, workln_ptr, NULL, NULL) == 1)
+   else if (read_db(instlldf, 1, 1, workln_ptr, NULL, &tem) == 1)
     {printf(" >dependency %s present\n", workln_ptr);}
    else
     {
-     if (read_db(indexf, 1, 1, workln_ptr, NULL, NULL) == 1)
+     if (read_db(indexf, 1, 1, workln_ptr, NULL, &tem) == 1)
       {
        strcat(installme, prog);
        strcat(installme, " -i ");
@@ -603,7 +603,7 @@ int main(int argc, char *argv[]){
       }
      else
       {
-       if (read_db(instlld, 1, 1, argv[2], &intmp, NULL) == 1)
+       if (read_db(instlld, 1, 1, argv[2], &intmp, &indeps) == 1)
         {run_app(infldr, argv[2], argv[3], argc, argv);}
        else
         {printf("%s was not found in %s!\n", argv[2], instlld);}
@@ -615,7 +615,7 @@ int main(int argc, char *argv[]){
       {printf("Usage: %s %s [pkg]\n", argv[0], argv[1]);}
      else
       {
-        if (read_db(instlld, 1, 1, argv[2], &intmp, NULL) == 1)
+        if (read_db(instlld, 1, 1, argv[2], &intmp, &indeps) == 1)
          {run_app(infldr, argv[2], NULL, argc, argv);}
         else
          {printf("%s was not found in %s!\n", argv[2], instlld);}
