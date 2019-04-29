@@ -17,7 +17,7 @@
 #include "mod_installer.h"
 #include "mod_setup.h"
 #define UUA __attribute__((__unused__))
-#define VERSION "0.9-rc"
+#define VERSION "1.0"
 #define PKGDIR "/pkgmgr"
 #define INDIR "/bin"
 #define ARCHDIR "/ARCH"
@@ -64,10 +64,7 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
     {
      write(cfgfd_creat,"repo=", strlen("repo="));
      write(cfgfd_creat,REPO, strlen(REPO));
-     write(cfgfd_creat,"\narch=python2\n", strlen("\narch=python2\n"));
-     write(cfgfd_creat,"#arch=python3\n", strlen("#arch=python3\n"));
-     write(cfgfd_creat,"#arch=i386\n", strlen("#arch=i386\n"));
-     write(cfgfd_creat,"#arch=amd64\n", strlen("#arch=amd64\n"));
+     write(cfgfd_creat,"\narch=stable\n", strlen("\narch=stable\n"));
      close(cfgfd_creat);
      printf("Initial pkgmgr.cfg created!\n");
     }
@@ -253,17 +250,14 @@ int main(int argc, char *argv[]){
  int i = 0, j = 0, sup_arch = 0, cfgfd = -1, arch_set = 0, \
      repo_set = 0, pkgverlen = 0, instlldfd = -1, ri = 0, ui = 0;
  char pkgfldr[512] = "", infldr[512] = "", archfldr[512] = "", \
-      instlld[512] = "", arch[16] = "python2", repo[1024] = REPO, \
+      instlld[512] = "", arch[16] = "stable", repo[1024] = REPO, \
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
       indexfile[512] = "", intmp[256] = "", intmp2[256] = "", syscall[1024], \
       lctmp[12] = "", lctmp2[256] = "", pkgver[32] = "", indeps[4096] = "", \
       pkginver[256] = "", pkgonver[256] = "";
  const char *home = getenv("HOME");
- const char *archlst[4];
- archlst[0] = "python2";
- archlst[1] = "python3";
- archlst[2] = "i386";
- archlst[3] = "amd64";
+ const char *archlst[1];
+ archlst[0] = "stable";
 
  /* pfad var init */
  strcpy(pkgfldr, home);
