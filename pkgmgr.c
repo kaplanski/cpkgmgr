@@ -16,6 +16,7 @@
 #include "mod_dbinterpret.h"
 #include "mod_installer.h"
 #include "mod_setup.h"
+#include "mod_hash.h"
 #define UUA __attribute__((__unused__))
 #define VERSION "1.0"
 #define PKGDIR "/pkgmgr"
@@ -212,8 +213,6 @@ void handle_deps(char pkgdir[512], char *prog[], char indexf[512], char instlldf
   }
 }
 
-
-
 /* just an info display */
 void info(void){
  printf("+-----------------------------------------------+\n" \
@@ -256,7 +255,7 @@ int main(int argc, char *argv[]){
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
       indexfile[512] = "", intmp[256] = "", intmp2[256] = "", syscall[1024], \
       lctmp[12] = "", lctmp2[256] = "", pkgver[32] = "", indeps[4096] = "", \
-      pkginver[256] = "", pkgonver[256] = "";
+      pkginver[256] = "", pkgonver[256] = "", pkghashf[256] = "";
  const char *home = getenv("HOME");
  const char *archlst[1];
  archlst[0] = "stable";
@@ -417,6 +416,13 @@ int main(int argc, char *argv[]){
          printf("Checking dependencies...\n");
          handle_deps(pkgfldr, &argv[0], indexfile, instlld, indeps);
 
+         /* set intmp2 and pkghashf */
+         strncpy(intmp2, intmp, strlen(intmp)-4);
+         intmp2[strlen(intmp)-3] = '\0';
+
+         strcpy(pkghashf, intmp2);
+         strcat(pkghashf, ".sha3");
+
          /* package phase */
          if(access(intmp, F_OK) != -1)
           {printf("Using cached package...\n");}
@@ -425,11 +431,16 @@ int main(int argc, char *argv[]){
            force_dwn:
            printf("Downloading %s... ", argv[2]);
            fflush(stdout);
+           /* download package */
            download(repo, arch, intmp, NULL);
+
+           /* download hash */
+           download(repo, arch, pkghashf, NULL);
           }
 
-         strncpy(intmp2, intmp, strlen(intmp)-4);
-         intmp2[strlen(intmp)-3] = '\0';
+         /* check hash */
+         if ((chkhsh(intmp2, pkghashf)) != 0)
+          {printf("Package %s is invalid. Continue? [y/N]\n", argv[0]);}
 
          if (ri == 1)
           {install(intmp2, pkgfldr, infldr, argv[2], 1);}
