@@ -27,6 +27,6 @@ cd cpkgmgr && ./build.sh install
 - repo will receive some more packages  
   
 *Bugs:*  
-no known bugs  
+- list does not show apps without ending  
   
 **pkgmgr** Who needs root when you are $USER?
