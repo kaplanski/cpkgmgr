@@ -255,7 +255,7 @@ int main(int argc, char *argv[]){
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
       indexfile[512] = "", intmp[256] = "", intmp2[256] = "", syscall[1024], \
       lctmp[12] = "", lctmp2[256] = "", pkgver[32] = "", indeps[4096] = "", \
-      pkginver[256] = "", pkgonver[256] = "", pkghashf[256] = "";
+      pkginver[256] = "", pkgonver[256] = "", pkghashf[256] = "", inbuf;
  const char *home = getenv("HOME");
  const char *archlst[1];
  archlst[0] = "stable";
@@ -440,7 +440,18 @@ int main(int argc, char *argv[]){
 
          /* check hash */
          if ((chkhsh(intmp, pkghashf)) != 0)
-          {printf("Package %s is invalid. Continue? [y/N]\n", argv[0]);}
+          {
+           inval_chkhsh:
+           printf("Package %s is invalid. Continue? [y/N]: ", argv[0]);
+           fflush(stdout);
+           scanf("%s", &inbuf);
+           if (((strcmp(&inbuf, "n") == 0) || (strcmp(&inbuf, "N") == 0)))
+            {printf("abort\n"); exit(7);}
+           else if (((strcmp(&inbuf, "y") == 0) || (strcmp(&inbuf, "Y") == 0)))
+            {sleep(0); /* do nothing exept continue*/}
+           else
+            {printf("invalid\n"); fflush(stdin); goto inval_chkhsh;}
+          }
 
          if (ri == 1)
           {install(intmp2, pkgfldr, infldr, argv[2], 1);}
