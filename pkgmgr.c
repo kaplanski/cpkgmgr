@@ -439,7 +439,7 @@ int main(int argc, char *argv[]){
           }
 
          /* check hash */
-         if ((chkhsh(intmp2, pkghashf)) != 0)
+         if ((chkhsh(intmp, pkghashf)) != 0)
           {printf("Package %s is invalid. Continue? [y/N]\n", argv[0]);}
 
          if (ri == 1)

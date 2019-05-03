@@ -240,7 +240,7 @@ extern void fhash(char fname[512], char (*rval)[512]){
  if (buffer)
   {sha3(buffer, length, *rval, 512);}
  else
-  {fprintf(stderr, "ERR - buffer not read\n"); exit(255);}
+  {fprintf(stderr, "ERR - buffer not read fhash\n"); exit(255);}
 }
 
 extern int chkhsh(char tgz[512], char hashfile[512]){
@@ -276,7 +276,7 @@ extern int chkhsh(char tgz[512], char hashfile[512]){
    {fprintf(stderr, "ERR - HASH_MISS\n");return 1;}
  }
  else
-  {fprintf(stderr, "ERR - buffer not read\n"); return 2;}
+  {fprintf(stderr, "ERR - buffer not read hashfile\n"); return 2;}
 }
 
 #endif
