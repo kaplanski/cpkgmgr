@@ -134,14 +134,13 @@ extern void install(char pkg[256], char pkgdir[512], char indir[512], char app[6
   }
  else
   {
-   printf("tgz = %s\n", tgz);
    printf("[FAIL]\nArchive not present in %s!\n", archdir);
+   printf("tgz = %s\n", tgz);
    exit(177);
   }
 
  /* generic install */
- printf("Installing %s... ", app);
- fflush(stdout);
+ printf("Installing %s...\n", app);
 
  /* depreciated, c port of pkgmgr does execute files with endings */
  //if [ -f "$2" -o -f "$2.bin" -o -f "$2.sh" -o -f "$2.py" ]; then
