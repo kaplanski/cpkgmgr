@@ -3,7 +3,7 @@
 CC=
 PROG="pkgmgr"
 PROGPATH="$HOME/$PROG"
-FLAGS="-std=gnu99 -Wall -Wextra -pedantic -Wno-nonnull"
+FLAGS="-std=gnu99 -Wall -Wextra -pedantic"
 
 if [ "$CFLAGS" != "" ]; then
    FLAGS="$FLAGS $CFLAGS"
@@ -22,12 +22,12 @@ fi
 if [ "$1" == "help" ];then
    echo "Usage: $0 [cmd]"
    echo "       all: builds $PROG"
-   echo "     noawk: builds $PROG without awk used in list function"
+   echo "     nocut: builds $PROG without cut used in list function"
    echo "     debug: builds $PROG with debug output enabled"
    echo "   install: installs $PROG in $PROGPATH"
    echo "     clean: cleans the build dir"
    echo "   alias to 'all' is $0 w/o any cmd"
-elif [ "$1" == "" -o "$1" == "all" -o "$1" == "noawk" -o "$1" == "debug" ]; then
+elif [ "$1" == "" -o "$1" == "all" -o "$1" == "nocut" -o "$1" == "debug" ]; then
    #set compiler
    echo "Setting compiler..."
    if [ "$CC" == "" ]; then
@@ -60,9 +60,9 @@ elif [ "$1" == "" -o "$1" == "all" -o "$1" == "noawk" -o "$1" == "debug" ]; then
           FLAGS="$FLAGS -DOLD_WGET"
       fi
    fi
-   if [ "$1" == "noawk" -o ! -f /usr/bin/awk -a ! -f /usr/local/bin/awk ]; then
-      echo "   not using awk"
-      FLAGS="$FLAGS -DNO_AWK"
+   if [ "$1" == "nocut" -o ! -f /usr/bin/cut -a ! -f /usr/local/bin/cut ]; then
+      echo "   not using cut"
+      FLAGS="$FLAGS -DNO_CUT"
    fi
    echo "   DONE"
 

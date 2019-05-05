@@ -102,20 +102,16 @@ void run_app(char indir[512], char pkg[], char app[], int argc, char *argv[]){
   {
    if (strcmp(argv[1], "list") == 0)
     {
-     for (i = 1; i < (int)(sizeof(end)/sizeof(*end)); i++)
-      {
-       strcpy(syscall, "cd ");
-       strcat(syscall, app_path);
-       strcat(syscall, " && ls -1 *");
-       strcat(syscall, end[i]);
-       #ifndef NO_AWK
-       strcat(syscall, "  2>/dev/null | awk -F. '{print $1}'");
-       #endif
-       #ifdef NO_AWK
-       strcat(syscall, "  2>/dev/null");
-       #endif
-       system(syscall);
-      }
+     strcpy(syscall, "cd ");
+     strcat(syscall, app_path);
+     strcat(syscall, " && ls -1 -F | grep '*$'");
+     #ifndef NO_CUT
+     strcat(syscall, " 2>/dev/null | cut -d '*' -f1 | cut -d '.' -f1");
+     #endif
+     #ifdef NO_CUT
+     strcat(syscall, " 2>/dev/null");
+     #endif
+     system(syscall);
      exit(0);
     }
    else if (strcmp(argv[1], "run") == 0)
@@ -139,9 +135,9 @@ void run_app(char indir[512], char pkg[], char app[], int argc, char *argv[]){
   if (app_present == 1)
    {
     if (argc<5)
-     {execvp(tmp, NULL);}
+     {system(tmp);} //some apps react to execvp(tmp, NULL); with segfault
     else
-     {execvp(tmp, argv + 3);}
+     {execvp(tmp, argv + 3);} //this however works fine
    }
    else
     {printf("App not present in app folder!\n"); exit(133);}
