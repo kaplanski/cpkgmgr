@@ -25,8 +25,10 @@ cd cpkgmgr && ./build.sh install
   
 *Upcomming:*  
 - repo will receive some more packages  
+- hash switch to something faster (md5 would be ok for now)  
+  (sha3 is nice for a proof-of-concept but slow for packages larger than a few kb)  
   
 *Bugs:*  
-- list does not show apps without ending  
+no known bugs  
   
 **pkgmgr** Who needs root when you are $USER?
