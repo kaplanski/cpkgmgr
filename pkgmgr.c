@@ -96,8 +96,16 @@ void run_app(char indir[512], char pkg[], char app[], int argc, char *argv[]){
  strcat(app_path, pkg);
  strcat(app_path, "/");
 
+ if ((strcmp(pkg, "pkgmgr")) == 0)
+  {
+   printf("bash3.2# poweroff\n");
+   sleep(2);
+   printf("Just kidding. Don't list/run pkgmgr.\n");
+   exit(42);
+  }
+
  if(access(app_path, F_OK) == -1)
-  {printf("App %s is not installed!\n", app);}
+  {printf("%s is not installed!\n", pkg); exit(255);}
  else
   {
    if (strcmp(argv[1], "list") == 0)

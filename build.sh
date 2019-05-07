@@ -69,7 +69,7 @@ elif [ "$1" == "" -o "$1" == "all" -o "$1" == "nocut" -o "$1" == "debug" ]; then
    #debug output
    if [ "$1" == "debug" ]; then
       echo "   debug output enabled"
-      FLAGS="$FLAGS -DDEBUG"
+      FLAGS="$FLAGS -DDEBUG -g"
    fi
 
    #it's showtime
