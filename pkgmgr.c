@@ -174,6 +174,9 @@ void handle_deps(char pkgdir[512], char *prog[], char indexf[512], char instlldf
  char fname1[512] = "", fname2[512] = "", fname3[512] = "", \
       installme[10240] = "", *workln_ptr, tem[4096] = "", tem2[256] = "";
 
+ if ((strlen(pkgdeps)) < 1)
+  {goto no_deps;}
+
  /* get list length */
  while ((tmp = strstr(tmp, ",")))
   {ln_len++; tmp++;}
@@ -213,7 +216,15 @@ void handle_deps(char pkgdir[512], char *prog[], char indexf[512], char instlldf
   {
    printf("installme: %s\n", installme);
    system(installme);
-   printf("dependencies installed");
+
+   printf("dependencies installed\n");
+  }
+
+ /* only to be accessed by goto */
+ if (0 == 1)
+  {
+   no_deps:
+   printf("no dependencies\n");
   }
 }
 
