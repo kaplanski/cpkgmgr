@@ -112,9 +112,9 @@ void run_app(char indir[512], char pkg[], char app[], int argc, char *argv[]){
     {
      strcpy(syscall, "cd ");
      strcat(syscall, app_path);
-     strcat(syscall, " && ls -1 -F | grep '*$'");
+     strcat(syscall, " && ls -1 -F | grep -e '*$' -e '@$' ");
      #ifndef NO_CUT
-     strcat(syscall, " 2>/dev/null | cut -d '*' -f1 | cut -d '.' -f1");
+     strcat(syscall, " 2>/dev/null | cut -d '*' -f1 | cut -d '@' -f1 |cut -d '.' -f1");
      #endif
      #ifdef NO_CUT
      strcat(syscall, " 2>/dev/null");
