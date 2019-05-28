@@ -27,7 +27,6 @@ unsigned long long crc64(char *tohash, long length){
    buf = x64 + x4 +x3 + num + 1;
    rval = rval + buf;
   }
- //printf("%llx", rval);
  return rval;
 }
 
@@ -77,16 +76,10 @@ int chkhsh(char tgz[512], char hfile[512]){
       {return 1;}
     }
    else
-    {
-     fprintf(stderr, "failed to read into buffer\n");
-     return 2;
-    }
+    {return 2;}
   }
  else
-  {
-   perror("fail");
-   return 2;
-  }
+  {return 2;}
  return 1;
 }
 #endif
