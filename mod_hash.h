@@ -32,7 +32,6 @@ unsigned long long crc64(char *tohash, long length){
 }
 
 int chkhsh(char tgz[512], char hfile[512]){
- int fd = -1;
  char * tohash = 0;
  char * prehash = 0;
  long lenhfile = 0, lentohash = 0;
