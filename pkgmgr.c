@@ -431,19 +431,19 @@ int main(int argc, char *argv[]){
          printf("Checking dependencies...\n");
          handle_deps(pkgfldr, &argv[0], indexfile, instlld, indeps);
 
-         /* set intmp2 and pkghashf */
-         strncpy(intmp2, intmp, strlen(intmp)-4);
-         intmp2[strlen(intmp)-3] = '\0';
-
-         strcpy(pkghashf, intmp2);
-         strcat(pkghashf, ".crc");
-
          /* package phase */
          if(access(intmp, F_OK) != -1)
           {printf("Using cached package...\n");}
          else
           {
            force_dwn:
+           /* set intmp2 and pkghashf */
+           strncpy(intmp2, intmp, strlen(intmp)-4);
+           intmp2[strlen(intmp)-3] = '\0';
+
+           strcpy(pkghashf, intmp2);
+           strcat(pkghashf, ".crc");
+
            printf("Downloading %s... ", argv[2]);
            fflush(stdout);
            /* download package */
