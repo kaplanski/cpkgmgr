@@ -436,7 +436,7 @@ int main(int argc, char *argv[]){
          intmp2[strlen(intmp)-3] = '\0';
 
          strcpy(pkghashf, intmp2);
-         strcat(pkghashf, ".sha3");
+         strcat(pkghashf, ".crc");
 
          /* package phase */
          if(access(intmp, F_OK) != -1)

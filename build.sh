@@ -3,7 +3,7 @@
 CC=
 PROG="pkgmgr"
 PROGPATH="$HOME/$PROG"
-FLAGS="-std=gnu99 -Wall -Wextra -pedantic -DSKIP_HASH"
+FLAGS="-std=gnu99 -Wall -Wextra -pedantic"
 
 if [ "$CFLAGS" != "" ]; then
    FLAGS="$FLAGS $CFLAGS"
