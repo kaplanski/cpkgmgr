@@ -458,7 +458,7 @@ int main(int argc, char *argv[]){
          if ((chkhsh(intmp, pkghashf)) != 0)
           {
            inval_chkhsh:
-           printf("Package %s is invalid. Continue? [y/N]: ", argv[1]);
+           printf("Package %s is invalid. Continue? [y/N]: ", argv[2]);
            fflush(stdout);
            scanf("%s", &inbuf);
            if (((strcmp(&inbuf, "n") == 0) || (strcmp(&inbuf, "N") == 0)))
