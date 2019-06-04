@@ -4,9 +4,14 @@ CC=
 PROG="pkgmgr"
 PROGPATH="$HOME/$PROG"
 FLAGS="-std=gnu99 -Wall -Wextra -pedantic"
+LD_FLAGS="-lm"
 
 if [ "$CFLAGS" != "" ]; then
    FLAGS="$FLAGS $CFLAGS"
+fi
+
+if [ "$LDFLAGS" != "" ]; then
+   LD_FLAGS="$LD_FLAGS $LDFLAGS"
 fi
 
 #check if someone builds in the wrong place
@@ -74,8 +79,8 @@ elif [ "$1" == "" -o "$1" == "all" -o "$1" == "nocut" -o "$1" == "debug" ]; then
 
    #it's showtime
    echo
-   echo "$CC $FLAGS $PROG.c -o $PROG"
-   $CC $FLAGS $PROG.c -o $PROG
+   echo "$CC $FLAGS $PROG.c -o $PROG $LD_FLAGS"
+   $CC $FLAGS $PROG.c -o $PROG $LD_FLAGS
    echo
 
 #install/copy to the program folder at $PROGPATH
