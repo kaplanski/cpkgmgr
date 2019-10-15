@@ -1,7 +1,7 @@
 # pkgmgr - a lightweight package manager
 
 **pkgmgr** is a lightweight package manager which installs  
-packages to a folder inside the user's home directory.  
+packages into a folder inside the users home directory.  
 It's purpose is to have ones favorite software installed  
 without needing root access or changing the system.  
 
