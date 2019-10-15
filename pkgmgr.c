@@ -22,7 +22,7 @@
 #define PKGDIR "/pkgmgr"
 #define INDIR "/bin"
 #define ARCHDIR "/ARCH"
-#define REPO "https://gitup.uni-potsdam.de/kaplanski/pkgmgr/raw/master/repo"
+#define REPO "https://github.com/kaplanski/pkgmgr/raw/master/repo"
 
 /* initial creation of various folders and the instlld file */
 void first_run(char pkgdir[512], char indir[512], char archdir[512], \
