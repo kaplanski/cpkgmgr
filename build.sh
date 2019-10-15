@@ -59,7 +59,6 @@ elif [ "$1" == "" -o "$1" == "all" -o "$1" == "nocut" -o "$1" == "debug" ]; then
       exit 177
    else
       wgetver=$(wget --version | grep "Wget 1." | cut -d " " -f 3 | cut -d "." -f 2)
-      echo $wgetver
       if ((wgetver < 16)); then
           echo "   wget version below 1.16"
           echo "   formated wget output disabled"
