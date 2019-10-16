@@ -63,9 +63,13 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
    cfgfd_creat = open(cfgfile, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
    if (cfgfd_creat != -1)
     {
+     write(cfgfd_creat,"#pkgmgr config file\n", strlen("#pkgmgr config file\n"));
+     write(cfgfd_creat,"#uncomment the options you want to use and comment the other ones out\n", strlen("#uncomment the options you want to use and comment the other ones out\n"));
      write(cfgfd_creat,"repo=", strlen("repo="));
      write(cfgfd_creat,REPO, strlen(REPO));
      write(cfgfd_creat,"\narch=stable\n", strlen("\narch=stable\n"));
+     write(cfgfd_creat,"#arch=lnx-bin\n", strlen("#arch=lnx-bin\n"));
+     write(cfgfd_creat,"#autoclean=yes\n", strlen("#autoclean=yes\n"));
      close(cfgfd_creat);
      printf("Initial pkgmgr.cfg created!\n");
     }
@@ -264,13 +268,15 @@ void help(char *prg, char pkgdir[512], char indir[512], char arch[16]){
 int main(int argc, char *argv[]){
  /* Var Init */
  int i = 0, j = 0, sup_arch = 0, cfgfd = -1, arch_set = 0, \
-     repo_set = 0, pkgverlen = 0, instlldfd = -1, ri = 0, ui = 0;
+     repo_set = 0, aclean_set = 0, pkgverlen = 0, instlldfd = -1, \
+     ri = 0, ui = 0;
  char pkgfldr[512] = "", infldr[512] = "", archfldr[512] = "", \
       instlld[512] = "", arch[16] = "stable", repo[1024] = REPO, \
       cfgfile[512] = "", cfgbuf[32] = "", cfgln[512] = "", cfgtmp[512], \
       indexfile[512] = "", intmp[256] = "", intmp2[256] = "", syscall[1024], \
       lctmp[12] = "", lctmp2[256] = "", pkgver[32] = "", indeps[4096] = "", \
-      pkginver[256] = "", pkgonver[256] = "", pkghashf[256] = "", UUA inbuf;
+      pkginver[256] = "", pkgonver[256] = "", pkghashf[256] = "", UUA inbuf, \
+      aclean[16] = "";
  const char *home = getenv("HOME");
  const char *archlst[1];
  archlst[0] = "stable";
@@ -327,6 +333,14 @@ int main(int argc, char *argv[]){
            arch_set = 1;
            #ifdef DEBUG
            printf("arch set!\n");
+           #endif
+          }
+         else if (((strncmp(cfgtmp, "autoclean=", 10)) == 0) && (aclean_set == 0))
+          {
+           strcpy(aclean, cfgtmp+10);
+           aclean_set = 1;
+           #ifdef DEBUG
+           printf("autoclean set!\n");
            #endif
           }
 
@@ -431,13 +445,6 @@ int main(int argc, char *argv[]){
          printf("Checking dependencies...\n");
          handle_deps(pkgfldr, &argv[0], indexfile, instlld, indeps);
 
-         /* set intmp2 and pkghashf */
-         strncpy(intmp2, intmp, strlen(intmp)-4);
-         intmp2[strlen(intmp)-3] = '\0';
-
-         strcpy(pkghashf, intmp2);
-         strcat(pkghashf, ".crc");
-
          /* package phase */
          if(access(intmp, F_OK) != -1)
           {printf("Using cached package...\n");}
@@ -448,10 +455,18 @@ int main(int argc, char *argv[]){
            fflush(stdout);
            /* download package */
            download(repo, arch, intmp, NULL);
-
-           /* download hash */
-           download(repo, arch, pkghashf, NULL);
           }
+
+         /* set intmp2 and pkghashf */
+         strncpy(intmp2, intmp, strlen(intmp)-4);
+         intmp2[strlen(intmp)-3] = '\0';
+
+         strcpy(pkghashf, intmp2);
+         strcat(pkghashf, ".crc");
+
+         /* download hash */
+         download(repo, arch, pkghashf, NULL);
+
 
          #ifndef SKIP_HASH
          /* check hash */
@@ -603,7 +618,7 @@ int main(int argc, char *argv[]){
      goto installer;
     }
 
-   /* set arch or repo */
+   /* update an already installed pkg */
    else if ((strcmp(argv[1], "-ui")) == 0)
     {
      if (argc < 3)
@@ -618,6 +633,16 @@ int main(int argc, char *argv[]){
              {printf("%s (%s) is already up-to-date\n", argv[2], pkginver);}
             else
              {
+              ver_update_chk:
+              printf("Are you sure to update %s from version %s to %s? [y/n] ", argv[2], pkginver, pkgonver);
+              fflush(stdout);
+              scanf("%s", &inbuf);
+              if (((strcmp(&inbuf, "n") == 0) || (strcmp(&inbuf, "N") == 0)))
+               {printf("abort\n"); exit(7);}
+              else if (((strcmp(&inbuf, "y") == 0) || (strcmp(&inbuf, "Y") == 0)))
+               {sleep(0); /* do nothing exept continue*/}
+              else
+               {printf("invalid\n"); fflush(stdin); goto ver_update_chk;}
               read_db(indexfile, 1, 1, argv[2], &intmp, &indeps);
               ui = 1;
               chdir(archfldr);
@@ -672,4 +697,7 @@ int main(int argc, char *argv[]){
     {printf("Unknown option!\n");}
   }
 
-return 0;}
+ if (strcmp(aclean, "yes") == 0)
+  {printf("Performing autoclean... "); fflush(stdout); clean(archfldr);}
+ return 0;
+}
