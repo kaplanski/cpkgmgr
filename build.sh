@@ -92,8 +92,8 @@ elif [ "$1" == "install" -a -f $PROG ]; then
       ./$PROG "-h"
       echo
    fi
-   echo "$PROG is copied to $PROGPATH"
    cp $PROG $PROGPATH
+   echo "$PROG was copied to $PROGPATH"
 
 #or build first if it wasn't build
 elif [ "$1" == "install" -a ! -f $PROG ]; then
