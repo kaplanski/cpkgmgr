@@ -69,6 +69,8 @@ void first_run(char pkgdir[512], char indir[512], char archdir[512], \
      write(cfgfd_creat,REPO, strlen(REPO));
      write(cfgfd_creat,"\narch=stable\n", strlen("\narch=stable\n"));
      write(cfgfd_creat,"#arch=lnx-bin\n", strlen("#arch=lnx-bin\n"));
+     write(cfgfd_creat,"#arch=rpi-bin\n", strlen("#arch=rpi-bin\n"));
+     write(cfgfd_creat,"#arch=freebsd11-bin\n", strlen("#arch=freebsd11-bin\n"));
      write(cfgfd_creat,"#autoclean=yes\n", strlen("#autoclean=yes\n"));
      close(cfgfd_creat);
      printf("Initial pkgmgr.cfg created!\n");
