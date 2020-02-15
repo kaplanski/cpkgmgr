@@ -1,6 +1,6 @@
 /*
  pkgmgr - a lightweight package manager
- Copyright (c) 2019 Jan-Daniel Kaplanski
+ Copyright (c) 2019-2020 Jan-Daniel Kaplanski
  MIT/X11 LICENSE
 */
 
@@ -620,7 +620,7 @@ int main(int argc, char *argv[]){
      goto installer;
     }
 
-   /* update an already installed pkg */
+   /* update an already installed package */
    else if ((strcmp(argv[1], "-ui")) == 0)
     {
      if (argc < 3)
@@ -677,6 +677,8 @@ int main(int argc, char *argv[]){
         {printf("%s was not found in %s!\n", argv[2], instlld);}
       }
     }
+
+   /* list contents of a package */
    else if ((strcmp(argv[1], "list")) == 0)
     {
      if (argc != 3)
@@ -689,10 +691,12 @@ int main(int argc, char *argv[]){
          {printf("%s was not found in %s!\n", argv[2], instlld);}
       }
     }
+
+   /* print version */
    else if ((strcmp(argv[1], "-v")) == 0)
     {
      printf("pkgmgr %s - a lightweight package manager\n" \
-            "Copyright (c) 2019 Jan-Daniel Kaplanski\n" \
+            "Copyright (c) 2019-2020 Jan-Daniel Kaplanski\n" \
             "MIT/X11 LICENSE\n", VERSION);
     }
    else
