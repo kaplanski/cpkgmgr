@@ -1,4 +1,10 @@
-# pkgmgr - a lightweight package manager
+# [Unmaintained] pkgmgr - a lightweight package manager
+
+Update May/2023: I plan on doing a complete rewrite of the code base.   
+I had originally written this project during my time at uni as a   
+quick-and-dirty solution that only needed to work for me.   
+I would not recommend to use it, as it is not written with security in mind.   
+However, in the upcomming rewrite I plan to focus on security through best-practice.
 
 **pkgmgr** is a lightweight package manager which installs  
 packages into a folder inside the users home directory.  
@@ -22,12 +28,9 @@ cd cpkgmgr && ./build.sh install
   
 *Dependencies:*  
 - wget (package download)  
-- awk (optional - formats output of 'list' function)  
-  
-*Upcomming:*  
-- repo will receive some more packages  
-  
+- awk (optional - formats output of 'list' function)   
+
 *Bugs:*  
 no known bugs  
-  
+
 **pkgmgr** Who needs root when you are $USER?
